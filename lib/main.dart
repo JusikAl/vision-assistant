@@ -1,8 +1,9 @@
-import 'camera_page.dart';
-
 import 'package:flutter/material.dart';
 
+import 'live_camera_page.dart';
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
@@ -11,6 +12,9 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(home: CameraPage());
+    return const MaterialApp(
+      debugShowCheckedModeBanner: false,
+      home: LiveCameraPage(),
+    );
   }
 }
