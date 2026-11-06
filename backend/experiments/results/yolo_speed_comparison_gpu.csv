@@ -1,0 +1,4 @@
+model,device,images,avg_latency_ms,median_latency_ms,estimated_fps,total_detections
+yolo26n.pt,0,100,17.49,15.37,57.17,177
+yolo11n.pt,0,100,15.75,15.92,63.49,199
+yolo11s.pt,0,100,16.0,14.74,62.51,199
