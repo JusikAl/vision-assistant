@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:camera/camera.dart';
@@ -7,6 +8,200 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:web_socket_channel/web_socket_channel.dart';
+
+// ==========================================
+// FRAME ENCODER ISOLATE
+// ==========================================
+
+void _encoderIsolateEntry(SendPort mainPort) {
+  final receivePort = ReceivePort();
+  mainPort.send(receivePort.sendPort);
+
+  receivePort.listen((dynamic message) {
+    try {
+      final job = message as List<dynamic>;
+
+      final data = (job[0] as TransferableTypedData)
+          .materialize()
+          .asUint8List();
+
+      final width = job[1] as int;
+      final height = job[2] as int;
+      final stride = job[3] as int;
+      final rotation = job[4] as int;
+
+      const maxDimension = 960;
+
+      final longestSide = width > height ? width : height;
+
+      final scale = longestSide > maxDimension
+          ? maxDimension / longestSide
+          : 1.0;
+
+      final targetWidth = (width * scale).round();
+      final targetHeight = (height * scale).round();
+
+      final image = img.Image(width: targetWidth, height: targetHeight);
+
+      final uvStart = stride * height;
+
+      for (int y = 0; y < targetHeight; y++) {
+        final sourceY = y * height ~/ targetHeight;
+        final yRow = sourceY * stride;
+        final uvRow = uvStart + (sourceY ~/ 2) * stride;
+
+        for (int x = 0; x < targetWidth; x++) {
+          final sourceX = x * width ~/ targetWidth;
+
+          final yIndex = yRow + sourceX;
+          final uvIndex = uvRow + (sourceX ~/ 2) * 2;
+
+          if (yIndex >= data.length || uvIndex + 1 >= data.length) {
+            throw const FormatException('Invalid NV21 buffer');
+          }
+
+          final luma = data[yIndex];
+          final v = data[uvIndex] - 128;
+          final u = data[uvIndex + 1] - 128;
+
+          final r = (luma + 1.402 * v).clamp(0, 255).toInt();
+
+          final g = (luma - 0.344136 * u - 0.714136 * v).clamp(0, 255).toInt();
+
+          final b = (luma + 1.772 * u).clamp(0, 255).toInt();
+
+          image.setPixelRgb(x, y, r, g, b);
+        }
+      }
+
+      final oriented = rotation == 0
+          ? image
+          : img.copyRotate(image, angle: rotation);
+
+      final jpeg = Uint8List.fromList(img.encodeJpg(oriented, quality: 78));
+
+      mainPort.send([true, jpeg]);
+    } catch (error) {
+      mainPort.send([false, error.toString()]);
+    }
+  });
+}
+
+// ==========================================
+// FRAME ENCODER
+// ==========================================
+
+class _FrameEncoder {
+  Isolate? _isolate;
+  ReceivePort? _receivePort;
+  StreamSubscription<dynamic>? _receiveSubscription;
+  SendPort? _sendPort;
+  Completer<Uint8List>? _pending;
+  Future<void>? _starting;
+
+  bool _disposed = false;
+
+  Future<void> start() {
+    if (_disposed) {
+      return Future.error(StateError('Encoder already disposed'));
+    }
+
+    return _starting ??= _initialize();
+  }
+
+  Future<void> _initialize() async {
+    final ready = Completer<SendPort>();
+
+    _receivePort = ReceivePort();
+
+    _receiveSubscription = _receivePort!.listen((dynamic message) {
+      if (message is SendPort) {
+        if (!ready.isCompleted) {
+          ready.complete(message);
+        }
+        return;
+      }
+
+      if (message is List && message.length == 2) {
+        final request = _pending;
+        _pending = null;
+
+        if (request == null || request.isCompleted) {
+          return;
+        }
+
+        if (message[0] == true) {
+          request.complete(message[1] as Uint8List);
+        } else {
+          request.completeError(StateError(message[1].toString()));
+        }
+      }
+    });
+
+    _isolate = await Isolate.spawn<SendPort>(
+      _encoderIsolateEntry,
+      _receivePort!.sendPort,
+    );
+
+    _sendPort = await ready.future;
+  }
+
+  Future<Uint8List> encode(CameraImage frame, int rotation) {
+    if (_disposed || _sendPort == null || _pending != null) {
+      return Future.error(StateError('Encoder is unavailable'));
+    }
+
+    if (frame.format.group != ImageFormatGroup.nv21 ||
+        frame.planes.length != 1) {
+      return Future.error(UnsupportedError('Expected single-plane NV21'));
+    }
+
+    final pending = Completer<Uint8List>();
+    _pending = pending;
+
+    try {
+      final plane = frame.planes.first;
+
+      final payload = TransferableTypedData.fromList([plane.bytes]);
+
+      _sendPort!.send([
+        payload,
+        frame.width,
+        frame.height,
+        plane.bytesPerRow,
+        rotation,
+      ]);
+    } catch (error, stackTrace) {
+      _pending = null;
+
+      pending.completeError(error, stackTrace);
+    }
+
+    return pending.future;
+  }
+
+  void dispose() {
+    _disposed = true;
+
+    final pending = _pending;
+    _pending = null;
+
+    if (pending != null && !pending.isCompleted) {
+      pending.completeError(StateError('Encoder disposed'));
+    }
+
+    _receiveSubscription?.cancel();
+    _receivePort?.close();
+
+    _isolate?.kill(priority: Isolate.immediate);
+
+    _sendPort = null;
+  }
+}
+
+// ==========================================
+// LIVE CAMERA PAGE
+// ==========================================
 
 class LiveCameraPage extends StatefulWidget {
   const LiveCameraPage({super.key});
@@ -18,7 +213,10 @@ class LiveCameraPage extends StatefulWidget {
 class _LiveCameraPageState extends State<LiveCameraPage> {
   CameraController? controller;
   WebSocketChannel? socket;
-  StreamSubscription? subscription;
+  StreamSubscription<dynamic>? subscription;
+  Timer? responseTimeout;
+
+  final _encoder = _FrameEncoder();
 
   bool running = false;
   bool waitingForResponse = false;
@@ -32,15 +230,20 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
   int imageHeight = 0;
 
   double processingMs = 0;
+  double yoloMs = 0;
+  double depthMs = 0;
   double fps = 0;
+
+  bool depthEnabled = false;
 
   DateTime lastSent = DateTime.fromMillisecondsSinceEpoch(0);
 
   DateTime? lastResult;
 
-  static const String serverUrl = 'ws://192.168.8.57:8000/ws/detect';
+  // CHANGE IP IF YOUR PC ADDRESS CHANGES
+  static const serverUrl = 'ws://192.168.10.3:8000/ws/detect';
 
-  static const int frameIntervalMs = 250;
+  static const frameIntervalMs = 100;
 
   @override
   void initState() {
@@ -48,12 +251,16 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
     initializeCamera();
   }
 
+  // ======================================
+  // CAMERA INITIALIZATION
+  // ======================================
+
   Future<void> initializeCamera() async {
     try {
       final cameras = await availableCameras();
 
       if (cameras.isEmpty) {
-        throw Exception('No cameras found');
+        throw StateError('No cameras found');
       }
 
       final selected = cameras.firstWhere(
@@ -81,16 +288,18 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
         controller = camera;
         status = 'Camera ready';
       });
-    } catch (e) {
-      debugPrint('Camera initialization error: $e');
-
+    } catch (error) {
       if (mounted) {
         setState(() {
-          status = 'Camera error: $e';
+          status = 'Camera error: $error';
         });
       }
     }
   }
+
+  // ======================================
+  // START DETECTION
+  // ======================================
 
   Future<void> startDetection() async {
     final camera = controller;
@@ -100,10 +309,12 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
     }
 
     setState(() {
-      status = 'Connecting to YOLO server...';
+      status = 'Connecting...';
     });
 
     try {
+      await _encoder.start();
+
       final channel = WebSocketChannel.connect(Uri.parse(serverUrl));
 
       await channel.ready.timeout(const Duration(seconds: 8));
@@ -114,7 +325,6 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
       }
 
       socket = channel;
-
       running = true;
       waitingForResponse = false;
       lastResult = null;
@@ -123,7 +333,7 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
 
       subscription = channel.stream.listen(
         onResult,
-        onError: (error) {
+        onError: (Object error) {
           stopDetection(errorMessage: 'Connection error: $error');
         },
         onDone: () {
@@ -138,53 +348,17 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
           status = 'Detecting';
         });
       }
-    } catch (e) {
-      debugPrint('Start detection error: $e');
-
-      await stopDetection(errorMessage: 'Start failed: $e');
+    } catch (error) {
+      await stopDetection(errorMessage: 'Start failed: $error');
     }
   }
 
-  void onResult(dynamic message) {
-    if (!mounted || !running) return;
-
-    try {
-      final data = jsonDecode(message as String) as Map<String, dynamic>;
-
-      final now = DateTime.now();
-
-      double currentFps = 0;
-
-      if (lastResult != null) {
-        final elapsed = now.difference(lastResult!).inMicroseconds;
-
-        if (elapsed > 0) {
-          currentFps = 1000000 / elapsed;
-        }
-      }
-
-      lastResult = now;
-
-      setState(() {
-        detections = data['detections'] ?? [];
-
-        imageWidth = (data['image_width'] as num?)?.toInt() ?? 0;
-
-        imageHeight = (data['image_height'] as num?)?.toInt() ?? 0;
-
-        processingMs = (data['processing_ms'] as num?)?.toDouble() ?? 0;
-
-        fps = currentFps;
-      });
-    } catch (e) {
-      debugPrint('YOLO response error: $e');
-    } finally {
-      waitingForResponse = false;
-    }
-  }
+  // ======================================
+  // FRAME PROCESSING
+  // ======================================
 
   void processFrame(CameraImage frame) {
-    if (!running || waitingForResponse) {
+    if (!running || waitingForResponse || stopping) {
       return;
     }
 
@@ -197,83 +371,105 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
     waitingForResponse = true;
     lastSent = now;
 
-    try {
-      final jpegBytes = convertFrame(frame);
+    final sensorOrientation = controller?.description.sensorOrientation ?? 90;
 
-      if (running && socket != null) {
-        socket!.sink.add(jpegBytes);
-      } else {
+    final rotation = frame.width > frame.height
+        ? ((sensorOrientation % 360) + 360) % 360
+        : 0;
+
+    _sendFrame(frame, rotation);
+  }
+
+  Future<void> _sendFrame(CameraImage frame, int rotation) async {
+    try {
+      final jpeg = await _encoder.encode(frame, rotation);
+
+      if (!running || socket == null) {
         waitingForResponse = false;
+        return;
       }
-    } catch (e) {
-      debugPrint('Frame conversion error: $e');
+
+      socket!.sink.add(jpeg);
+
+      responseTimeout?.cancel();
+
+      responseTimeout = Timer(const Duration(seconds: 10), () {
+        if (running) {
+          stopDetection(errorMessage: 'Server response timeout');
+        }
+      });
+    } catch (error) {
+      debugPrint('Frame processing error: $error');
 
       waitingForResponse = false;
     }
   }
 
-  Uint8List convertFrame(CameraImage frame) {
-    if (frame.format.group != ImageFormatGroup.nv21 ||
-        frame.planes.length != 1) {
-      throw UnsupportedError('Expected single-plane NV21 frame');
+  // ======================================
+  // SERVER RESPONSE
+  // ======================================
+
+  void onResult(dynamic message) {
+    responseTimeout?.cancel();
+    responseTimeout = null;
+
+    if (!mounted || !running) {
+      return;
     }
 
-    final width = frame.width;
-    final height = frame.height;
+    try {
+      final data = jsonDecode(message as String) as Map<String, dynamic>;
 
-    final plane = frame.planes[0];
-    final bytes = plane.bytes;
+      final now = DateTime.now();
+      var currentFps = 0.0;
 
-    final yStride = plane.bytesPerRow;
-    final uvStart = yStride * height;
+      if (lastResult != null) {
+        final elapsed = now.difference(lastResult!).inMicroseconds;
 
-    final output = img.Image(width: width, height: height);
-
-    for (int y = 0; y < height; y++) {
-      for (int x = 0; x < width; x++) {
-        final yIndex = y * yStride + x;
-
-        final uvIndex = uvStart + (y ~/ 2) * yStride + (x ~/ 2) * 2;
-
-        if (yIndex >= bytes.length || uvIndex + 1 >= bytes.length) {
-          throw const FormatException('Invalid NV21 frame buffer');
+        if (elapsed > 0) {
+          currentFps = 1000000 / elapsed;
         }
-
-        final yValue = bytes[yIndex];
-
-        final v = bytes[uvIndex] - 128;
-        final u = bytes[uvIndex + 1] - 128;
-
-        final r = (yValue + 1.402 * v).clamp(0, 255).toInt();
-
-        final g = (yValue - 0.344136 * u - 0.714136 * v).clamp(0, 255).toInt();
-
-        final b = (yValue + 1.772 * u).clamp(0, 255).toInt();
-
-        output.setPixelRgb(x, y, r, g, b);
       }
+
+      lastResult = now;
+
+      setState(() {
+        detections = data['detections'] as List<dynamic>? ?? [];
+
+        imageWidth = (data['image_width'] as num?)?.toInt() ?? 0;
+
+        imageHeight = (data['image_height'] as num?)?.toInt() ?? 0;
+
+        processingMs = (data['processing_ms'] as num?)?.toDouble() ?? 0;
+
+        yoloMs = (data['yolo_ms'] as num?)?.toDouble() ?? 0;
+
+        depthMs = (data['depth_ms'] as num?)?.toDouble() ?? 0;
+
+        depthEnabled = data['depth_enabled'] == true;
+
+        fps = currentFps;
+      });
+    } catch (error) {
+      debugPrint('Response error: $error');
+    } finally {
+      waitingForResponse = false;
     }
-
-    img.Image processedImage = output;
-
-    if (width > height) {
-      final sensorOrientation = controller?.description.sensorOrientation ?? 90;
-
-      final rotation = sensorOrientation == 270 ? 270 : 90;
-
-      processedImage = img.copyRotate(output, angle: rotation);
-    }
-
-    return Uint8List.fromList(img.encodeJpg(processedImage, quality: 85));
   }
+
+  // ======================================
+  // STOP DETECTION
+  // ======================================
 
   Future<void> stopDetection({String? errorMessage}) async {
     if (stopping) return;
 
     stopping = true;
-
     running = false;
     waitingForResponse = false;
+
+    responseTimeout?.cancel();
+    responseTimeout = null;
 
     try {
       await subscription?.cancel();
@@ -287,19 +483,23 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
 
       await socket?.sink.close();
       socket = null;
-    } catch (e) {
-      debugPrint('Stop detection error: $e');
+    } catch (error) {
+      debugPrint('Stop error: $error');
     } finally {
       stopping = false;
 
       if (mounted) {
         setState(() {
           detections = [];
+
           imageWidth = 0;
           imageHeight = 0;
 
-          fps = 0;
           processingMs = 0;
+          yoloMs = 0;
+          depthMs = 0;
+          depthEnabled = false;
+          fps = 0;
 
           status = errorMessage ?? 'Stopped';
         });
@@ -307,31 +507,26 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
     }
   }
 
+  // ======================================
+  // CAMERA PREVIEW
+  // ======================================
+
   Widget buildCameraPreview() {
     final camera = controller;
 
     if (camera == null || !camera.value.isInitialized) {
       if (status.startsWith('Camera error')) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(status, textAlign: TextAlign.center),
-          ),
-        );
+        return Center(child: Text(status, textAlign: TextAlign.center));
       }
 
       return const Center(child: CircularProgressIndicator());
     }
 
     return Container(
-      width: double.infinity,
-      height: double.infinity,
       color: Colors.black,
       alignment: Alignment.center,
-
       child: CameraPreview(
         camera,
-
         child: CustomPaint(
           painter: LiveDetectionPainter(
             detections: detections,
@@ -343,16 +538,19 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
     );
   }
 
+  // ======================================
+  // UI
+  // ======================================
+
   @override
   Widget build(BuildContext context) {
     final cameraReady = controller?.value.isInitialized == true;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('YOLO Live Detection'),
+        title: const Text('YOLO + Depth Live Detection'),
         centerTitle: true,
       ),
-
       body: SafeArea(
         child: Column(
           children: [
@@ -368,26 +566,24 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
 
                   Text(
                     'Objects: ${detections.length} | '
-                    'FPS: ${fps.toStringAsFixed(1)}',
+                    'Result FPS: ${fps.toStringAsFixed(1)}',
                   ),
 
                   const SizedBox(height: 4),
 
                   Text(
-                    'Processing: '
-                    '${processingMs.toStringAsFixed(0)} ms',
+                    'Server: ${processingMs.toStringAsFixed(0)} ms | '
+                    'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
+                    'Depth: ${depthEnabled ? '${depthMs.toStringAsFixed(0)} ms' : 'off'}',
                   ),
 
                   if (imageWidth > 0 && imageHeight > 0) ...[
                     const SizedBox(height: 4),
 
-                    Text(
-                      'Frame: '
-                      '$imageWidth x $imageHeight',
-                    ),
+                    Text('Frame: $imageWidth x $imageHeight'),
                   ],
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
 
                   SizedBox(
                     width: double.infinity,
@@ -418,14 +614,21 @@ class _LiveCameraPageState extends State<LiveCameraPage> {
   void dispose() {
     running = false;
 
+    responseTimeout?.cancel();
     subscription?.cancel();
-    socket?.sink.close();
 
+    socket?.sink.close();
     controller?.dispose();
+
+    _encoder.dispose();
 
     super.dispose();
   }
 }
+
+// ==========================================
+// DETECTION PAINTER
+// ==========================================
 
 class LiveDetectionPainter extends CustomPainter {
   final List<dynamic> detections;
@@ -447,15 +650,16 @@ class LiveDetectionPainter extends CustomPainter {
       return;
     }
 
-    final fittedSizes = applyBoxFit(
+    final fitted = applyBoxFit(
       BoxFit.contain,
       Size(imageWidth.toDouble(), imageHeight.toDouble()),
       size,
     );
 
-    final destination = fittedSizes.destination;
+    final destination = fitted.destination;
 
     final scaleX = destination.width / imageWidth;
+
     final scaleY = destination.height / imageHeight;
 
     final offsetX = (size.width - destination.width) / 2;
@@ -497,11 +701,17 @@ class LiveDetectionPainter extends CustomPainter {
 
       final name = item['class_name']?.toString() ?? 'Object';
 
-      final confidence = (item['confidence'] as num?)?.toDouble() ?? 0.0;
+      final confidence = (item['confidence'] as num?)?.toDouble() ?? 0;
+
+      // Distance from FastAPI
+      final distance = (item['distance_m'] as num?)?.toDouble();
+
+      final validDistance =
+          distance != null && distance.isFinite && distance > 0;
 
       final label =
-          '$name '
-          '${(confidence * 100).toStringAsFixed(0)}%';
+          '$name ${(confidence * 100).toStringAsFixed(0)}%'
+          '${validDistance ? ' · ${distance.toStringAsFixed(2)} m' : ''}';
 
       final textPainter = TextPainter(
         text: TextSpan(
@@ -547,9 +757,9 @@ class LiveDetectionPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant LiveDetectionPainter oldDelegate) {
-    return oldDelegate.imageWidth != imageWidth ||
-        oldDelegate.imageHeight != imageHeight ||
-        oldDelegate.detections != detections;
+  bool shouldRepaint(covariant LiveDetectionPainter old) {
+    return old.imageWidth != imageWidth ||
+        old.imageHeight != imageHeight ||
+        old.detections != detections;
   }
 }

@@ -23,7 +23,7 @@ class _CameraPageState extends State<CameraPage> {
   String? errorMessage;
   List<dynamic> detections = [];
 
-  static const String apiUrl = 'http://192.168.8.57:8000/detect';
+  static const String apiUrl = 'http://192.168.10.3:8000/detect';
 
   Future<void> pickImage(ImageSource source) async {
     try {
