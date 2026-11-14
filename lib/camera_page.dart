@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 
+import 'app_config.dart';
+
 class CameraPage extends StatefulWidget {
   const CameraPage({super.key});
 
@@ -17,13 +19,14 @@ class _CameraPageState extends State<CameraPage> {
   int? imageWidth;
   int? imageHeight;
 
-  final picker = ImagePicker();
+  final ImagePicker picker = ImagePicker();
 
   bool isLoading = false;
   String? errorMessage;
   List<dynamic> detections = [];
 
-  static const String apiUrl = 'http://192.168.10.3:8000/detect';
+  // Адрес сервера автоматически берётся из AppConfig.
+  String get apiUrl => AppConfig.detectUrl;
 
   Future<void> pickImage(ImageSource source) async {
     try {
@@ -31,7 +34,8 @@ class _CameraPageState extends State<CameraPage> {
 
       if (pickedFile == null) return;
 
-      final bytes = await File(pickedFile.path).readAsBytes();
+      final file = File(pickedFile.path);
+      final bytes = await file.readAsBytes();
       final decoded = await decodeImageFromList(bytes);
 
       final width = decoded.width;
@@ -41,7 +45,7 @@ class _CameraPageState extends State<CameraPage> {
       if (!mounted) return;
 
       setState(() {
-        image = File(pickedFile.path);
+        image = file;
         imageWidth = width;
         imageHeight = height;
         detections = [];
@@ -70,11 +74,8 @@ class _CameraPageState extends State<CameraPage> {
 
       request.files.add(await http.MultipartFile.fromPath('file', image!.path));
 
-      final streamedResponse = await request.send().timeout(
-        const Duration(seconds: 60),
-      );
-
-      final response = await http.Response.fromStream(streamedResponse);
+      final response = await http.Response.fromStream(await request.send())
+          .timeout(const Duration(seconds: 60));
 
       if (response.statusCode != 200) {
         throw Exception(
@@ -83,12 +84,25 @@ class _CameraPageState extends State<CameraPage> {
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
+
       final result = data['detections'] as List<dynamic>;
 
       if (!mounted) return;
 
       setState(() {
         detections = result;
+      });
+    } on SocketException catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        errorMessage = 'Cannot connect to server: $apiUrl\n$e';
+      });
+    } on HttpException catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        errorMessage = 'HTTP error: $e';
       });
     } catch (e) {
       if (!mounted) return;
@@ -190,17 +204,22 @@ class _CameraPageState extends State<CameraPage> {
                   errorMessage == null &&
                   detections.isNotEmpty) ...[
                 const SizedBox(height: 20),
+
                 Text(
                   'Detected objects: ${detections.length}',
                   style: Theme.of(context).textTheme.titleLarge,
                 ),
+
                 const SizedBox(height: 8),
 
                 ...detections.map((item) {
                   final detection = item as Map<String, dynamic>;
-                  final name = detection['class_name'];
+
+                  final name = detection['class_name'] ?? 'Unknown';
+
                   final confidence = (detection['confidence'] as num)
                       .toDouble();
+
                   final bbox = detection['bbox'] as List<dynamic>;
 
                   return Card(
@@ -253,13 +272,13 @@ class DetectionPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Match the BoxFit.contain scale used by Image.file.
     final scaleX = size.width / imageWidth;
     final scaleY = size.height / imageHeight;
+
     final actualScale = scaleX < scaleY ? scaleX : scaleY;
 
-    // Center the scaled image inside the display area.
     final offsetX = (size.width - imageWidth * actualScale) / 2;
+
     final offsetY = (size.height - imageHeight * actualScale) / 2;
 
     final boxPaint = Paint()
@@ -273,13 +292,17 @@ class DetectionPainter extends CustomPainter {
 
     for (final item in detections) {
       final detection = item as Map<String, dynamic>;
+
       final bbox = detection['bbox'] as List<dynamic>;
 
       if (bbox.length < 4) continue;
 
       final x1 = (bbox[0] as num).toDouble() * actualScale + offsetX;
+
       final y1 = (bbox[1] as num).toDouble() * actualScale + offsetY;
+
       final x2 = (bbox[2] as num).toDouble() * actualScale + offsetX;
+
       final y2 = (bbox[3] as num).toDouble() * actualScale + offsetY;
 
       final rect = Rect.fromLTRB(x1, y1, x2, y2);
@@ -287,6 +310,7 @@ class DetectionPainter extends CustomPainter {
       canvas.drawRect(rect, boxPaint);
 
       final name = detection['class_name']?.toString() ?? 'Object';
+
       final confidence = (detection['confidence'] as num?)?.toDouble() ?? 0.0;
 
       final textPainter = TextPainter(

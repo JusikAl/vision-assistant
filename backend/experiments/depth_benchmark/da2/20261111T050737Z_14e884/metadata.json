@@ -1,0 +1,9 @@
+{
+  "session_id": "20261111T050737Z_14e884",
+  "model": "depth-anything/Depth-Anything-V2-Metric-Outdoor-Small-hf",
+  "actual_distance_m": 0.5,
+  "method": "center",
+  "target_class": "",
+  "save_frames": true,
+  "note": "Ground truth must be physically measured to target visible in camera; center mode samples central region, not guaranteed object surface."
+}

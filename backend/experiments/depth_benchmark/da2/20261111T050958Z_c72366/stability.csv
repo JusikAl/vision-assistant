@@ -1,0 +1,2 @@
+session_id,distance_m,calibrated_std_m,stabilized_std_m,calibrated_range_m,valid_measurements
+20261111T050958Z_c72366,0.75,0.04304,0.04304,0.21,51

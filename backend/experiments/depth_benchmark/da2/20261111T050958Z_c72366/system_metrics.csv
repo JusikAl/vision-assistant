@@ -1,0 +1,2 @@
+session_id,avg_yolo_ms,avg_depth_ms,avg_processing_ms,max_gpu_allocated_mb,max_gpu_reserved_mb
+20261111T050958Z_c72366,28.44902,212.62804,250.40137,89.52,304.0
