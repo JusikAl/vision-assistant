@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'dart:isolate';
 
 import 'package:camera/camera.dart';
+import 'package:camera_android_camerax/camera_android_camerax.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart'
+    show defaultTargetPlatform, kReleaseMode;
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -12,6 +15,10 @@ import 'app_config.dart';
 import 'safety_tts_service.dart';
 import 'voice_command_service.dart';
 import 'wake_word_service.dart';
+import 'services/detection_mode_manager.dart';
+import 'services/local_yolo_service.dart';
+import 'services/voice_command_parser.dart';
+import 'services/performance_report.dart';
 
 // ==========================================
 // FRAME ENCODER ISOLATE
@@ -106,6 +113,7 @@ class _FrameEncoder {
   Future<void>? _starting;
 
   bool _disposed = false;
+  bool get isBusy => _pending != null;
 
   Future<void> start() {
     if (_disposed) {
@@ -225,6 +233,23 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   Timer? _wakeRestartTimer;
 
   final _encoder = _FrameEncoder();
+  final DetectionModeManager _modeManager = DetectionModeManager();
+  final LocalYoloService _localYolo = LocalYoloService();
+  Timer? _reconnectTimer;
+  bool _reconnecting = false;
+  bool _offlineOnly = const bool.fromEnvironment('OFFLINE_ONLY');
+  String _offlineModelStatus = 'loading';
+  int _session = 0;
+  Stopwatch? _detectStartup;
+  bool _awaitingFirstResult = false;
+  // One in-flight inference provides backpressure; avoid additional delay.
+  static const int _offlineFrameIntervalMs = 60;
+  double offlinePreprocessMs = 0;
+  double offlinePostprocessMs = 0;
+
+  final _performance = PerformanceReport();
+  bool _speechOwnsAudio = false;
+  int _voiceFailures = 0;
 
   final SafetyTtsService _safetyTts = SafetyTtsService();
 
@@ -294,18 +319,88 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     super.initState();
 
     WidgetsBinding.instance.addObserver(this);
+    _performance.start();
+    AndroidCameraCameraX.analysisWidth = const int.fromEnvironment(
+      'YOLO_ANALYSIS_WIDTH',
+    );
+    AndroidCameraCameraX.analysisHeight = const int.fromEnvironment(
+      'YOLO_ANALYSIS_HEIGHT',
+    );
+    AndroidCameraCameraX.frameAdmission = _admitCameraFrame;
+    AndroidCameraCameraX.frameProfile = kReleaseMode
+        ? null
+        : (metrics) {
+            for (final metric in metrics.entries) {
+              _performance.record(metric.key, metric.value.toDouble());
+            }
+          };
+    _safetyTts.onSpeechStarted = (response, obstacle) {
+      _performance.record('tts_response_ms', response);
+      _performance.record('confirmed_to_speech_ms', obstacle);
+    };
+    _voiceCommands.onRecognitionMeasured = (milliseconds) =>
+        _performance.record('voice_recognition_ms', milliseconds);
+    _safetyTts.onSpeakingChanged = (speaking) async {
+      _speechOwnsAudio = speaking;
+      if (speaking) {
+        _wakeRestartTimer?.cancel();
+        await _voiceCommands.setSpeaking(true);
+        await _wakeWord.stop();
+        if (mounted) setState(() => voiceListening = false);
+      } else {
+        await _voiceCommands.setSpeaking(false);
+        _scheduleWakeListening(const Duration(milliseconds: 350));
+      }
+    };
 
     initializeCamera();
-
-    _safetyTts.initialize().catchError((Object error) {
-      debugPrint('TTS initialization error: $error');
+    // Paint the first UI before asset loading; all native initialization and
+    // warm-up run in the persistent YOLO worker, alongside camera setup.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) unawaited(_preloadLocalYolo());
     });
+
+    unawaited(
+      _safetyTts.initialize().then<void>(
+        (_) {
+          if (mounted) setState(() {});
+        },
+        onError: (Object error) {
+          debugPrint('TTS initialization error: $error');
+          if (mounted) setState(() {});
+        },
+      ),
+    );
+  }
+
+  Future<void> _preloadLocalYolo() async {
+    try {
+      await _localYolo.initialize();
+      if (mounted) setState(() => _offlineModelStatus = 'ready');
+    } catch (error) {
+      debugPrint('OFFLINE PRELOAD ERROR: $error');
+      if (mounted) setState(() => _offlineModelStatus = 'unavailable');
+    }
+  }
+
+  void _logFirstDetectionResult(String mode) {
+    if (!_awaitingFirstResult) return;
+    _awaitingFirstResult = false;
+    _performance.record(
+      'detect_startup_ms',
+      _detectStartup!.elapsedMicroseconds / 1000,
+    );
+    debugPrint(
+      'DETECT PERF mode=$mode detect_startup_ms='
+      '${(_detectStartup!.elapsedMicroseconds / 1000).toStringAsFixed(2)}',
+    );
   }
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       _wakeModeEnabled = true;
+      _safetyTts.setEnabled(voiceEnabled);
 
       if (controller?.value.isInitialized == true) {
         _scheduleWakeListening(const Duration(milliseconds: 800));
@@ -313,8 +408,10 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
       _wakeModeEnabled = false;
+      _safetyTts.setEnabled(false);
       _wakeRestartTimer?.cancel();
 
+      unawaited(_safetyTts.stop());
       unawaited(_voiceCommands.cancel());
       unawaited(_wakeWord.stop());
 
@@ -376,7 +473,6 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   Future<void> startDetection() async {
     final camera = controller;
-
     if (running ||
         stopping ||
         starting ||
@@ -386,57 +482,215 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     }
 
     starting = true;
-
-    setState(() {
-      status = 'Connecting...';
-    });
-
+    _safetyTts.resetScene();
+    final session = ++_session;
+    _detectStartup = Stopwatch()..start();
+    _awaitingFirstResult = true;
+    final wasPreloaded = _localYolo.isReady;
+    setState(
+      () => status = wasPreloaded
+          ? 'Starting detection...'
+          : 'Preparing offline YOLO...',
+    );
     try {
-      await _encoder.start();
-
-      debugPrint('WS CONNECT: $serverUrl');
-
-      final channel = WebSocketChannel.connect(Uri.parse(serverUrl));
-
-      await channel.ready.timeout(const Duration(seconds: 8));
-
-      if (!mounted) {
-        await channel.sink.close();
+      try {
+        await _localYolo.initialize();
+      } catch (error) {
+        // Online remains available if the local asset/native runtime fails.
+        debugPrint('Local YOLO unavailable at Start: $error');
+        if (_offlineOnly) rethrow;
+        final channel = await _modeManager.tryConnect(serverUrl);
+        if (!mounted || session != _session) {
+          unawaited(channel?.sink.close());
+          return;
+        }
+        if (channel == null) rethrow;
+        try {
+          await _encoder.start();
+        } catch (_) {
+          unawaited(channel.sink.close());
+          rethrow;
+        }
+        if (!mounted || session != _session) {
+          unawaited(channel.sink.close());
+          return;
+        }
+        _attachConnectedSocket(channel);
+      }
+      if (!mounted || (!_modeManager.isConnected && session != _session)) {
         return;
       }
-
-      socket = channel;
+      if (!_modeManager.isConnected) _modeManager.setOffline();
+      _offlineModelStatus = _localYolo.isReady ? 'ready' : 'unavailable';
       running = true;
       waitingForResponse = false;
+      _localYolo.beginSession();
       lastResult = null;
-
       lastSent = DateTime.fromMillisecondsSinceEpoch(0);
 
-      subscription = channel.stream.listen(
-        onResult,
-        onError: (Object error) {
-          unawaited(stopDetection(errorMessage: 'Connection error: $error'));
-        },
-        onDone: () {
-          unawaited(stopDetection(errorMessage: 'Server disconnected'));
-        },
-      );
-
       await camera.startImageStream(processFrame);
-
-      if (mounted && running) {
-        setState(() {
-          status = 'Detecting';
-        });
-      }
-    } catch (error) {
-      await stopDetection(
-        errorMessage: 'Start failed ($serverDebugAddress): $error',
+      if (!mounted || !running) return;
+      debugPrint(
+        'DETECT PERF detect_stream_start_ms='
+        '${(_detectStartup!.elapsedMicroseconds / 1000).toStringAsFixed(2)} '
+        'preloaded=$wasPreloaded mode=${_modeManager.mode.name}',
       );
+      if (_modeManager.isOffline) {
+        _startReconnectTimer();
+        // Server negotiation runs in parallel with working local detection.
+        if (!_offlineOnly) unawaited(_reconnectIfPossible());
+      }
+      setState(() {
+        status = _modeManager.isConnected
+            ? 'Connected: YOLO + Depth'
+            : 'OFFLINE: YOLO + voice warnings, no distance';
+      });
+    } catch (error) {
+      await stopDetection(errorMessage: 'NO DETECTION: $error');
+      if (voiceEnabled && mounted) {
+        await _safetyTts.speakMessage('Внимание. Обнаружение недоступно.');
+      }
     } finally {
       starting = false;
-
       if (mounted) setState(() {});
+    }
+  }
+
+  void _attachConnectedSocket(WebSocketChannel channel) {
+    _reconnectTimer?.cancel();
+    ++_session;
+    _safetyTts.resetScene();
+    _localYolo.cancelPending();
+    waitingForResponse = false;
+    lastResult = null;
+    _modeManager.setConnected();
+    socket = channel;
+    subscription = channel.stream.listen(
+      (message) {
+        if (identical(socket, channel)) onResult(message);
+      },
+      onError: (Object error) {
+        if (identical(socket, channel)) {
+          unawaited(_switchToOffline('Connection error: $error'));
+        }
+      },
+      onDone: () {
+        if (identical(socket, channel)) {
+          unawaited(_switchToOffline('Server disconnected'));
+        }
+      },
+    );
+  }
+
+  void _startReconnectTimer() {
+    _reconnectTimer?.cancel();
+    if (_offlineOnly) return;
+    _reconnectTimer = Timer.periodic(
+      const Duration(seconds: 15),
+      (_) => unawaited(_reconnectIfPossible()),
+    );
+  }
+
+  Future<void> _reconnectIfPossible() async {
+    if (_reconnecting ||
+        !running ||
+        stopping ||
+        !_modeManager.isOffline ||
+        _offlineOnly) {
+      return;
+    }
+    _reconnecting = true;
+    final session = _session;
+    try {
+      final channel = await _modeManager.tryConnect(serverUrl);
+      if (channel == null) return;
+      try {
+        await _encoder.start();
+      } catch (_) {
+        unawaited(channel.sink.close());
+        rethrow;
+      }
+      if (!mounted ||
+          !running ||
+          session != _session ||
+          !_modeManager.isOffline ||
+          stopping) {
+        unawaited(channel.sink.close());
+        return;
+      }
+      _attachConnectedSocket(channel);
+      responseTimeout?.cancel();
+      waitingForResponse = false;
+      lastSent = DateTime.fromMillisecondsSinceEpoch(0);
+      setState(() {
+        detections = [];
+        imageWidth = 0;
+        imageHeight = 0;
+        depthEnabled = false;
+        status = 'Connected: server restored';
+        lastSafetyWarning = '';
+      });
+    } catch (error) {
+      debugPrint('Server reconnect error: $error');
+    } finally {
+      _reconnecting = false;
+    }
+  }
+
+  Future<void> _switchToOffline(String reason) async {
+    if (!running || stopping || !_modeManager.isConnected) return;
+    _modeManager.setUnavailable();
+    final session = ++_session;
+    _safetyTts.resetScene();
+    _localYolo.cancelPending();
+    responseTimeout?.cancel();
+    responseTimeout = null;
+    waitingForResponse = false;
+
+    final previousSubscription = subscription;
+    final previousSocket = socket;
+    subscription = null;
+    socket = null;
+    await previousSubscription?.cancel();
+    try {
+      await previousSocket?.sink.close().timeout(
+        const Duration(milliseconds: 600),
+      );
+    } catch (_) {}
+
+    if (!mounted || !running || stopping || session != _session) return;
+    setState(() => status = 'Switching to offline: $reason');
+    try {
+      await _localYolo.initialize();
+      if (!mounted || !running || stopping || session != _session) return;
+      _modeManager.setOffline();
+      _localYolo.beginSession();
+      _startReconnectTimer();
+      setState(() {
+        detections = [];
+        imageWidth = 0;
+        imageHeight = 0;
+        depthEnabled = false;
+        depthMs = 0;
+        processingMs = 0;
+        yoloMs = 0;
+        offlinePreprocessMs = 0;
+        offlinePostprocessMs = 0;
+        lastSafetyWarning = '';
+        status = 'OFFLINE: YOLO + voice warnings, no distance';
+      });
+      if (voiceEnabled && mounted) {
+        unawaited(
+          _safetyTts.speakMessage(
+            'Сервер недоступен. Включено локальное обнаружение без измерения расстояния.',
+          ),
+        );
+      }
+    } catch (error) {
+      await stopDetection(errorMessage: 'NO DETECTION: $error');
+      if (voiceEnabled && mounted) {
+        await _safetyTts.speakMessage('Внимание. Обнаружение недоступно.');
+      }
     }
   }
 
@@ -444,16 +698,36 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   // FRAME PROCESSING
   // ======================================
 
+  bool _admitCameraFrame() {
+    // Count all analyzer callbacks, including those dropped before plane transfer.
+    _performance.cameraFrame();
+    if (!const bool.fromEnvironment('CAMERA_EARLY_DROP', defaultValue: true)) {
+      return true;
+    }
+    return running &&
+        !stopping &&
+        (!_modeManager.isOffline ||
+            (!waitingForResponse && !_localYolo.isBusy));
+  }
+
   void processFrame(CameraImage frame) {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      _performance.cameraFrame();
+    }
     if (!running || waitingForResponse || stopping) {
       return;
     }
 
+    // Drop frames before copying NV21/JPEG. Cancellation never opens the
+    // native slot until the actual old reply has drained.
+    if (_modeManager.isOffline && _localYolo.isBusy) return;
+    if (_modeManager.isConnected && _encoder.isBusy) return;
     final now = DateTime.now();
 
-    if (now.difference(lastSent).inMilliseconds < frameIntervalMs) {
-      return;
-    }
+    final interval = _modeManager.isOffline
+        ? _offlineFrameIntervalMs
+        : frameIntervalMs;
+    if (now.difference(lastSent).inMilliseconds < interval) return;
 
     waitingForResponse = true;
     lastSent = now;
@@ -464,14 +738,91 @@ class _LiveCameraPageState extends State<LiveCameraPage>
         ? ((sensorOrientation % 360) + 360) % 360
         : 0;
 
-    unawaited(_sendFrame(frame, rotation));
+    if (_modeManager.isOffline) {
+      unawaited(_processOfflineFrame(frame, rotation));
+    } else if (_modeManager.isConnected) {
+      unawaited(_sendFrame(frame, rotation));
+    } else {
+      waitingForResponse = false;
+    }
+  }
+
+  Future<void> _processOfflineFrame(CameraImage frame, int rotation) async {
+    final session = _session;
+    try {
+      // Connected Mode continues using the original JPEG/WebSocket encoder.
+      // Offline Mode reads NV21 directly and avoids the JPEG round-trip.
+      final result = await _localYolo.detectNv21(frame, rotation);
+      if (!mounted ||
+          !running ||
+          session != _session ||
+          !_modeManager.isOffline ||
+          stopping) {
+        return;
+      }
+      _logFirstDetectionResult('offline');
+      final alerts = _safetyTts.onDetections(
+        detections: result.detections,
+        imageWidth: result.imageWidth,
+        imageHeight: result.imageHeight,
+        frameAgeMs: result.processingMs,
+      );
+      _performance.record('inference_ms', result.yoloMs);
+      _performance.record('preprocess_ms', result.preprocessMs);
+      _performance.record('transfer_copy_ms', result.transferMs);
+      _performance.record('materialize_ms', result.materializeMs);
+      _performance.record('input_tensor_copy_ms', result.inputCopyMs);
+      _performance.record('output_view_ms', result.outputReadMs);
+      _performance.record('postprocess_ms', result.postprocessMs);
+      _performance.record(
+        'isolate_roundtrip_overhead_ms',
+        result.processingMs - result.workerMs - result.transferMs,
+      );
+      _performance.record('safety_ms', _safetyTts.lastSafetyMs);
+      _performance.yoloResult();
+      final now = DateTime.now();
+      final elapsed = lastResult == null
+          ? _detectStartup?.elapsedMicroseconds ?? 0
+          : now.difference(lastResult!).inMicroseconds;
+      lastResult = now;
+      setState(() {
+        detections = result.detections;
+        imageWidth = result.imageWidth;
+        imageHeight = result.imageHeight;
+        processingMs = result.processingMs;
+        yoloMs = result.yoloMs;
+        offlinePreprocessMs = result.preprocessMs;
+        offlinePostprocessMs = result.postprocessMs;
+        depthMs = 0;
+        depthEnabled = false;
+        fps = elapsed > 0 ? 1000000 / elapsed : 0;
+        lastSafetyWarning = alerts.isEmpty ? '' : alerts.first.text;
+      });
+    } catch (error) {
+      if (error is YoloRequestCancelled || session != _session) return;
+      debugPrint('OFFLINE YOLO ERROR: $error');
+      if (running && _modeManager.isOffline && !stopping) {
+        await stopDetection(
+          errorMessage: 'NO DETECTION: offline YOLO failed ($error)',
+        );
+        if (voiceEnabled && mounted) {
+          await _safetyTts.speakMessage('Ошибка локального обнаружения.');
+        }
+      }
+    } finally {
+      if (session == _session && _modeManager.isOffline) {
+        waitingForResponse = false;
+      }
+    }
   }
 
   Future<void> _sendFrame(CameraImage frame, int rotation) async {
+    final session = _session;
     try {
       final jpeg = await _encoder.encode(frame, rotation);
 
-      if (!running || socket == null) {
+      if (session != _session) return;
+      if (!running || !_modeManager.isConnected || socket == null) {
         waitingForResponse = false;
         return;
       }
@@ -482,13 +833,16 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
       responseTimeout = Timer(const Duration(seconds: 10), () {
         if (running) {
-          unawaited(stopDetection(errorMessage: 'Server response timeout'));
+          unawaited(_switchToOffline('Server response timeout'));
         }
       });
     } catch (error) {
+      if (session != _session) return;
       debugPrint('Frame processing error: $error');
-
       waitingForResponse = false;
+      if (running && _modeManager.isConnected && !stopping) {
+        unawaited(_switchToOffline('Camera/frame encoding error: $error'));
+      }
     }
   }
 
@@ -497,29 +851,32 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   // ======================================
 
   void onResult(dynamic message) {
-    if (!mounted || !running) return;
+    if (!mounted || !running || !_modeManager.isConnected) return;
 
     try {
       final data = jsonDecode(message as String) as Map<String, dynamic>;
 
       if (!data.containsKey('detections')) return;
+      _logFirstDetectionResult('connected');
 
       responseTimeout?.cancel();
       responseTimeout = null;
 
-      final safetyAlerts = data['safety_alerts'] as List<dynamic>? ?? [];
-
-      // Safety warnings stay independent of
-      // the wake-word recognizer.
-      if (voiceEnabled) {
-        _safetyTts.onFrame(safetyAlerts);
-      }
-
-      String currentWarning = '';
-
-      if (safetyAlerts.isNotEmpty && safetyAlerts.first is Map) {
-        currentWarning = (safetyAlerts.first as Map)['text']?.toString() ?? '';
-      }
+      final frameDetections = data['detections'] as List<dynamic>? ?? [];
+      final frameWidth = (data['image_width'] as num?)?.toInt() ?? 0;
+      final frameHeight = (data['image_height'] as num?)?.toInt() ?? 0;
+      // Same visual policy and same speaker in both modes. Do not forward
+      // arbitrary server prose or experimental distance_m values to speech.
+      final alerts = _safetyTts.onDetections(
+        detections: frameDetections,
+        imageWidth: frameWidth,
+        imageHeight: frameHeight,
+        allowReliableDepth: data['depth_enabled'] == true,
+        frameAgeMs: DateTime.now().difference(lastSent).inMicroseconds / 1000,
+      );
+      _performance.yoloResult();
+      _performance.record('safety_ms', _safetyTts.lastSafetyMs);
+      final currentWarning = alerts.isEmpty ? '' : alerts.first.text;
 
       final now = DateTime.now();
       var currentFps = 0.0;
@@ -535,13 +892,13 @@ class _LiveCameraPageState extends State<LiveCameraPage>
       lastResult = now;
 
       setState(() {
-        detections = data['detections'] as List<dynamic>? ?? [];
+        detections = frameDetections;
 
         lastSafetyWarning = currentWarning;
 
-        imageWidth = (data['image_width'] as num?)?.toInt() ?? 0;
+        imageWidth = frameWidth;
 
-        imageHeight = (data['image_height'] as num?)?.toInt() ?? 0;
+        imageHeight = frameHeight;
 
         processingMs = (data['processing_ms'] as num?)?.toDouble() ?? 0;
 
@@ -567,7 +924,10 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   void _scheduleWakeListening([
     Duration delay = const Duration(milliseconds: 1200),
   ]) {
-    if (!mounted || !_wakeModeEnabled || processingVoiceCommand) {
+    if (!mounted ||
+        !_wakeModeEnabled ||
+        _speechOwnsAudio ||
+        processingVoiceCommand) {
       return;
     }
 
@@ -583,6 +943,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   Future<void> _startWakeListening() async {
     if (!mounted ||
         !_wakeModeEnabled ||
+        _speechOwnsAudio ||
         _wakeStarting ||
         voiceListening ||
         processingVoiceCommand) {
@@ -640,7 +1001,10 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   // ======================================
 
   Future<void> _onWakeDetected() async {
-    if (!mounted || !_wakeModeEnabled || processingVoiceCommand) {
+    if (!mounted ||
+        !_wakeModeEnabled ||
+        _speechOwnsAudio ||
+        processingVoiceCommand) {
       return;
     }
 
@@ -660,6 +1024,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
           if (!mounted || !_wakeModeEnabled) return;
 
           _commandStarted = true;
+          _voiceFailures = 0;
 
           setState(() {
             recognizedVoiceText = 'Команда: $text';
@@ -676,6 +1041,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
         },
         onError: (message) {
           debugPrint('COMMAND STT ERROR: $message');
+          if (++_voiceFailures >= 3) _wakeModeEnabled = false;
 
           if (!mounted || !_wakeModeEnabled) return;
 
@@ -722,7 +1088,9 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     });
 
     if (_wakeModeEnabled) {
-      _scheduleWakeListening(const Duration(milliseconds: 900));
+      _scheduleWakeListening(
+        Duration(milliseconds: 900 * (1 << _voiceFailures.clamp(0, 3))),
+      );
     }
   }
 
@@ -732,10 +1100,8 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   Future<void> _executeVoiceCommand(String transcript) async {
     try {
-      final command = transcript
-          .toLowerCase()
-          .replaceAll(RegExp(r'[^а-яёa-z0-9\s]'), '')
-          .trim();
+      final command = VoiceCommandParser.normalize(transcript);
+      final intent = VoiceCommandParser.parse(command);
 
       String reply;
 
@@ -757,14 +1123,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
         }
 
         reply = 'Автоматические предупреждения включены';
-      } else if (_hasAny(command, [
-        'что впереди',
-        'что рядом',
-        'что вокруг',
-        'что ты видишь',
-        'что видишь',
-        'опиши',
-      ])) {
+      } else if (intent == VoiceCommand.describe) {
         reply = _describeDetectedObjects();
       } else if (_hasAny(command, [
         'повтори',
@@ -783,25 +1142,13 @@ class _LiveCameraPageState extends State<LiveCameraPage>
             'начать, остановить, что впереди, '
             'повтори, включи предупреждения '
             'или выключи предупреждения';
-      } else if (_hasAny(command, [
-        'останови',
-        'остановить',
-        'стоп',
-        'заверши обнаружение',
-        'выключи камеру',
-      ])) {
+      } else if (intent == VoiceCommand.stop) {
         if (running) {
           await stopDetection();
         }
 
         reply = 'Обнаружение остановлено';
-      } else if (_hasAny(command, [
-        'начни',
-        'начать',
-        'запусти',
-        'запустить',
-        'включи камеру',
-      ])) {
+      } else if (intent == VoiceCommand.start) {
         if (!running) {
           await startDetection();
         }
@@ -932,6 +1279,11 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     if (stopping) return;
 
     stopping = true;
+    ++_session;
+    _awaitingFirstResult = false;
+    _localYolo.cancelPending();
+    _reconnectTimer?.cancel();
+    _modeManager.setUnavailable();
     running = false;
     waitingForResponse = false;
 
@@ -950,7 +1302,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
         await camera.stopImageStream();
       }
 
-      await socket?.sink.close();
+      await socket?.sink.close().timeout(const Duration(milliseconds: 600));
       socket = null;
     } catch (error) {
       debugPrint('Stop error: $error');
@@ -967,6 +1319,8 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
           processingMs = 0;
           yoloMs = 0;
+          offlinePreprocessMs = 0;
+          offlinePostprocessMs = 0;
           depthMs = 0;
           fps = 0;
 
@@ -1014,6 +1368,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   Future<void> _restartWakeWord() async {
     if (processingVoiceCommand) return;
+    _voiceFailures = 0;
 
     _wakeRestartTimer?.cancel();
     _wakeModeEnabled = false;
@@ -1054,6 +1409,29 @@ class _LiveCameraPageState extends State<LiveCameraPage>
               child: Column(
                 children: [
                   Text('Status: $status', textAlign: TextAlign.center),
+                  Text('Offline YOLO: $_offlineModelStatus'),
+                  if (voiceEnabled && !_safetyTts.offlineVoiceReady)
+                    Text(
+                      _safetyTts.lastError == null
+                          ? 'Подготовка голоса…'
+                          : 'Голосовые предупреждения недоступны. Проверьте '
+                                'русский офлайн-голос в настройках синтеза речи Android.',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.orange),
+                    ),
+
+                  Text(
+                    _modeManager.isOffline
+                        ? 'MODE: OFFLINE · Visual warnings · Distance unavailable'
+                        : _modeManager.isConnected
+                        ? 'MODE: CONNECTED'
+                        : 'MODE: NO DETECTION',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: _modeManager.isOffline ? Colors.orange : null,
+                    ),
+                  ),
 
                   Text(
                     'WebSocket: $serverDebugAddress',
@@ -1071,11 +1449,15 @@ class _LiveCameraPageState extends State<LiveCameraPage>
                   const SizedBox(height: 4),
 
                   Text(
-                    'Server: '
-                    '${processingMs.toStringAsFixed(0)} ms | '
-                    'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
-                    'Depth: '
-                    '${depthEnabled ? '${depthMs.toStringAsFixed(0)} ms' : 'off'}',
+                    _modeManager.isOffline
+                        ? 'Offline total: ${processingMs.toStringAsFixed(0)} ms | '
+                              'Prep: ${offlinePreprocessMs.toStringAsFixed(0)} ms | '
+                              'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
+                              'Post: ${offlinePostprocessMs.toStringAsFixed(0)} ms'
+                        : 'Server: ${processingMs.toStringAsFixed(0)} ms | '
+                              'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
+                              'Depth: ${depthEnabled ? '${depthMs.toStringAsFixed(0)} ms' : 'off'}',
+                    textAlign: TextAlign.center,
                   ),
 
                   if (imageWidth > 0 && imageHeight > 0) ...[
@@ -1088,6 +1470,16 @@ class _LiveCameraPageState extends State<LiveCameraPage>
                   ],
 
                   const SizedBox(height: 8),
+
+                  SwitchListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: const Text('Только Offline YOLO (для проверки)'),
+                    subtitle: const Text('Сервер не используется'),
+                    value: _offlineOnly,
+                    onChanged: running || starting || stopping
+                        ? null
+                        : (value) => setState(() => _offlineOnly = value),
+                  ),
 
                   SwitchListTile(
                     contentPadding: EdgeInsets.zero,
@@ -1178,6 +1570,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   @override
   void dispose() {
+    ++_session;
     running = false;
 
     responseTimeout?.cancel();
@@ -1187,6 +1580,14 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     _wakeModeEnabled = false;
     _wakeRestartTimer?.cancel();
 
+    AndroidCameraCameraX.frameAdmission = null;
+    AndroidCameraCameraX.frameProfile = null;
+    AndroidCameraCameraX.analysisWidth = AndroidCameraCameraX.analysisHeight =
+        0;
+    _performance.dispose();
+    _safetyTts.onSpeakingChanged = null;
+    _safetyTts.onSpeechStarted = null;
+    _voiceCommands.onRecognitionMeasured = null;
     unawaited(_voiceCommands.dispose());
     unawaited(_wakeWord.dispose());
 
@@ -1196,6 +1597,8 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     unawaited(controller?.dispose());
 
     _encoder.dispose();
+    _reconnectTimer?.cancel();
+    unawaited(_localYolo.dispose());
 
     unawaited(_safetyTts.dispose());
 

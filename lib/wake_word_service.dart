@@ -106,20 +106,19 @@ class WakeWordService {
 
     if (_disposed || _listening) return;
 
+    final generation = _generation;
     await initialize();
 
-    if (_disposed) return;
+    if (_disposed || generation != _generation) return;
 
     final hasPermission = await _recorder.hasPermission();
-    if (_disposed) return;
+    if (_disposed || generation != _generation) return;
     if (!hasPermission) {
       throw StateError('Microphone permission denied');
     }
 
     _buffer.clear();
     _triggered = false;
-
-    final generation = ++_generation;
 
     final stream = await _recorder.startStream(
       const RecordConfig(

@@ -12,7 +12,7 @@ class AppConfig {
 
   // IP сервера
   static String get serverHost {
-    return dotenv.env['SERVER_HOST']?.trim() ?? '192.168.10.3';
+    return dotenv.env['SERVER_HOST']?.trim() ?? '192.168.8.57';
   }
 
   // Порт сервера

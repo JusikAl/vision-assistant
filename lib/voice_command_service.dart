@@ -5,8 +5,34 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 /// Short speech-recognition sessions for voice commands.
 /// Not a true, continuous/offline wake-word engine.
+enum VoiceState { idle, listening, processing, speaking, error }
+
 class VoiceCommandService {
-  final stt.SpeechToText _speech = stt.SpeechToText();
+  VoiceCommandService({
+    stt.SpeechToText? speech,
+    this.preferOnDevice = const bool.fromEnvironment('STT_ON_DEVICE'),
+  }) : _speech = speech ?? stt.SpeechToText();
+  final stt.SpeechToText _speech;
+  final bool preferOnDevice;
+  Future<void> _operations = Future.value();
+  int _requestId = 0;
+  bool _speaking = false;
+  VoiceState state = VoiceState.idle;
+  final Stopwatch _recognitionWatch = Stopwatch();
+  double lastRecognitionMs = 0;
+  void Function(double milliseconds)? onRecognitionMeasured;
+
+  Future<void> _serialize(Future<void> Function() action) {
+    final next = _operations.then((_) => action());
+    _operations = next.catchError((Object _) {});
+    return next;
+  }
+
+  Future<void> setSpeaking(bool value) async {
+    _speaking = value;
+    if (value) await cancel();
+    state = value ? VoiceState.speaking : VoiceState.idle;
+  }
 
   Future<bool>? _initialization;
   Timer? _finalResultTimer;
@@ -88,22 +114,47 @@ class VoiceCommandService {
     required void Function(String error) onError,
     required void Function() onDone,
     bool Function(String text)? acceptPartial,
+  }) {
+    final request = ++_requestId;
+    return _serialize(() async {
+      if (_disposed || _speaking || request != _requestId) return;
+      await _listen(
+        request: request,
+        onResult: onResult,
+        onPartial: onPartial,
+        onError: onError,
+        onDone: onDone,
+        acceptPartial: acceptPartial,
+      );
+    });
+  }
+
+  Future<void> _listen({
+    required int request,
+    required void Function(String) onResult,
+    required void Function(String) onPartial,
+    required void Function(String) onError,
+    required void Function() onDone,
+    bool Function(String)? acceptPartial,
   }) async {
     if (_disposed) return;
-    if (_active) await cancel();
+    if (_active) await _cancelInternal();
 
     bool available;
     try {
       available = await initialize();
     } catch (error) {
+      if (_disposed || request != _requestId) return;
+      state = VoiceState.error;
       onError('Инициализация распознавания: $error');
       // FIX: гарантируем onDone даже при ошибке инициализации.
       onDone();
       return;
     }
 
-    if (_disposed) return;
+    if (_disposed || _speaking || request != _requestId) return;
     if (!available) {
+      state = VoiceState.error;
       onError(
         'Распознавание речи недоступно. Проверьте разрешение на микрофон.',
       );
@@ -111,12 +162,17 @@ class VoiceCommandService {
       return;
     }
     if (_localeId == null) {
+      state = VoiceState.error;
       onError('Русский язык распознавания не установлен на телефоне.');
       onDone();
       return;
     }
 
     final session = ++_sessionId;
+    state = VoiceState.listening;
+    _recognitionWatch
+      ..reset()
+      ..start();
     _active = true;
     _completed = false;
     _lastPartial = '';
@@ -165,7 +221,8 @@ class VoiceCommandService {
           listenFor: _listenFor,
           pauseFor: _pauseFor,
           partialResults: true,
-          listenMode: stt.ListenMode.confirmation,
+          onDevice: preferOnDevice,
+          listenMode: stt.ListenMode.dictation,
         ),
       );
       debugPrint('STT STARTED');
@@ -177,7 +234,7 @@ class VoiceCommandService {
   bool _isCurrent(int session) =>
       !_disposed && _active && !_completed && session == _sessionId;
 
-  Future<void> _endTimedSession(int session) async {
+  Future<void> _endTimedSession(int session) => _serialize(() async {
     if (!_isCurrent(session)) return;
     try {
       await _speech.stop();
@@ -185,7 +242,7 @@ class VoiceCommandService {
       debugPrint('STT stop error: $error');
     }
     _scheduleFinalResult(session);
-  }
+  });
 
   void _handleEngineError(String message) {
     if (!_active || _completed) return;
@@ -215,40 +272,53 @@ class VoiceCommandService {
   // FIX: всегда вызываем onDone, даже если результат потерян из-за новой сессии.
   void _finishWithText(int session, String message) {
     if (!_isCurrent(session)) return;
+    state = VoiceState.processing;
+    lastRecognitionMs = _recognitionWatch.elapsedMicroseconds / 1000;
+    onRecognitionMeasured?.call(lastRecognitionMs);
     _completed = true;
     _active = false;
     _cancelTimers();
     final onResult = _onResult;
     final onDone = _onDone;
     _clearCallbacks();
-    unawaited(() async {
-      await _releaseRecognizer();
-      if (_disposed) return;
-      if (session == _sessionId) {
-        debugPrint('STT RECOGNIZED: $message');
-        onResult?.call(message);
-      }
-      onDone?.call();
-    }());
+    unawaited(
+      _serialize(() async {
+        if (_disposed || session != _sessionId) return;
+        await _releaseRecognizer();
+        if (_disposed) return;
+        if (session == _sessionId) {
+          debugPrint('STT RECOGNIZED: $message');
+          onResult?.call(message);
+        }
+        if (session == _sessionId) {
+          state = _speaking ? VoiceState.speaking : VoiceState.idle;
+          onDone?.call();
+        }
+      }),
+    );
   }
 
   void _finishWithError(int session, String message) {
     if (!_isCurrent(session)) return;
+    state = VoiceState.error;
     _completed = true;
     _active = false;
     _cancelTimers();
     final onError = _onError;
     final onDone = _onDone;
     _clearCallbacks();
-    unawaited(() async {
-      await _releaseRecognizer();
-      if (_disposed) return;
-      if (session == _sessionId) {
-        debugPrint('STT FAILURE: $message');
-        onError?.call(message);
-      }
-      onDone?.call();
-    }());
+    unawaited(
+      _serialize(() async {
+        if (_disposed || session != _sessionId) return;
+        await _releaseRecognizer();
+        if (_disposed) return;
+        if (session == _sessionId) {
+          debugPrint('STT FAILURE: $message');
+          onError?.call(message);
+        }
+        if (session == _sessionId) onDone?.call();
+      }),
+    );
   }
 
   Future<void> _releaseRecognizer() async {
@@ -274,7 +344,13 @@ class VoiceCommandService {
     _acceptPartial = null;
   }
 
-  Future<void> cancel() async {
+  Future<void> cancel() {
+    ++_requestId;
+    ++_sessionId;
+    return _serialize(_cancelInternal);
+  }
+
+  Future<void> _cancelInternal() async {
     final onDone = _onDone;
     ++_sessionId;
     _active = false;
@@ -283,6 +359,7 @@ class VoiceCommandService {
     _cancelTimers();
     _clearCallbacks();
     await _releaseRecognizer();
+    state = _speaking ? VoiceState.speaking : VoiceState.idle;
     onDone?.call();
   }
 

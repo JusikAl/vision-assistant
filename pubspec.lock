@@ -42,12 +42,11 @@ packages:
     source: hosted
     version: "0.12.2"
   camera_android_camerax:
-    dependency: transitive
+    dependency: "direct main"
     description:
-      name: camera_android_camerax
-      sha256: faf885ca8140f22df8dc05d1839afc702d0329dd9b0b2f0bc6f9b05f3f20e10c
-      url: "https://pub.dev"
-    source: hosted
+      path: "third_party/camera_android_camerax"
+      relative: true
+    source: path
     version: "0.7.6"
   camera_avfoundation:
     dependency: transitive
@@ -536,6 +535,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.1"
+  quiver:
+    dependency: transitive
+    description:
+      name: quiver
+      sha256: ea0b925899e64ecdfbf9c7becb60d5b50e706ade44a85b2363be2a22d88117d2
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.2.2"
   record:
     dependency: "direct main"
     description:
@@ -693,6 +700,13 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.7.12"
+  tflite_flutter:
+    dependency: "direct main"
+    description:
+      path: "third_party/tflite_flutter"
+      relative: true
+    source: path
+    version: "0.12.1"
   typed_data:
     dependency: transitive
     description:
