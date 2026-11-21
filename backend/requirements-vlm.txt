@@ -1,0 +1,4 @@
+# Additional dependencies for the existing backend (YOLO/Depth environment retained).
+httpx>=0.28,<1
+python-multipart>=0.0.20,<1
+Pillow>=11

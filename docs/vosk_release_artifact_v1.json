@@ -1,0 +1,14 @@
+{
+  "apk_bytes": 206380591,
+  "sha256": "7fadd7e836dc4b2b969acbd97e5a3eb798f5d6529c8676346609f82a39a14a97",
+  "whisper_entries": [],
+  "model_entries": 16,
+  "libraries": [
+    "lib/arm64-v8a/libjnidispatch.so",
+    "lib/arm64-v8a/libvosk.so",
+    "lib/armeabi-v7a/libjnidispatch.so",
+    "lib/armeabi-v7a/libvosk.so",
+    "lib/x86_64/libjnidispatch.so",
+    "lib/x86_64/libvosk.so"
+  ]
+}

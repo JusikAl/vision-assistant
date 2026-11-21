@@ -1,0 +1,19 @@
+{
+  "apk_bytes": 206397103,
+  "sha256": "522ea3952f685d6d296d818b1e639ad2174ba2e86199683b8cba77cf3ea82b24",
+  "production_actions_enabled": false,
+  "grammar_id": "v2-context-guards",
+  "jna_proguard_rules": true,
+  "whisper_entries": [],
+  "model_entries": 16,
+  "model_hashes_valid": true,
+  "installed_on": "CPH2727",
+  "release_model_load_and_pcm_stream_verified": true,
+  "release_camera_manual_start_stop_verified": true,
+  "observed_ui_fps_sample": 4.6,
+  "device_settings_restored": {
+    "wifi_on": 1,
+    "mobile_data": 0,
+    "stay_on_while_plugged_in": 0
+  }
+}

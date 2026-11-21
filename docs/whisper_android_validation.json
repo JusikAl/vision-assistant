@@ -1,0 +1,773 @@
+{
+  "load": [
+    {
+      "wall_ms": 607,
+      "native_ms": 592.367552
+    }
+  ],
+  "command": [
+    {
+      "expected": "start",
+      "phrase": "Начать",
+      "attempt": 0,
+      "condition": "normal",
+      "text": null,
+      "matched": false,
+      "wall_ms": 5697,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начни",
+      "attempt": 1,
+      "condition": "quiet",
+      "text": "Начни.",
+      "matched": true,
+      "wall_ms": 9268,
+      "inference_ms": 9231.43734,
+      "avg_logprob": -0.056985,
+      "no_speech_prob": 1.9e-05,
+      "current_parser_matches": true,
+      "routed_command": "start"
+    },
+    {
+      "expected": "start",
+      "phrase": "Запусти",
+      "attempt": 2,
+      "condition": "added_noise",
+      "text": null,
+      "matched": false,
+      "wall_ms": 5476,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начать обнаружение",
+      "attempt": 3,
+      "condition": "normal",
+      "text": "Начать обнаружение.",
+      "matched": true,
+      "wall_ms": 10235,
+      "inference_ms": 10224.58286,
+      "avg_logprob": -0.081619,
+      "no_speech_prob": 0.00017,
+      "current_parser_matches": true,
+      "routed_command": "start"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начать",
+      "attempt": 4,
+      "condition": "quiet",
+      "text": null,
+      "matched": false,
+      "wall_ms": 8817,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начни",
+      "attempt": 5,
+      "condition": "added_noise",
+      "text": "Начни.",
+      "matched": true,
+      "wall_ms": 9663,
+      "inference_ms": 9012.667445,
+      "avg_logprob": -0.05661,
+      "no_speech_prob": 0.000225,
+      "current_parser_matches": true,
+      "routed_command": "start"
+    },
+    {
+      "expected": "start",
+      "phrase": "Запусти",
+      "attempt": 6,
+      "condition": "normal",
+      "text": "Запусти.",
+      "matched": true,
+      "wall_ms": 8974,
+      "inference_ms": 8967.185986,
+      "avg_logprob": -0.039157,
+      "no_speech_prob": 3e-06,
+      "current_parser_matches": true,
+      "routed_command": "start"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начать обнаружение",
+      "attempt": 7,
+      "condition": "quiet",
+      "text": null,
+      "matched": false,
+      "wall_ms": 5596,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начать",
+      "attempt": 8,
+      "condition": "added_noise",
+      "text": ", начать.",
+      "matched": true,
+      "wall_ms": 9066,
+      "inference_ms": 9060.696038,
+      "avg_logprob": -0.296507,
+      "no_speech_prob": 2.7e-05,
+      "current_parser_matches": true,
+      "routed_command": "start"
+    },
+    {
+      "expected": "start",
+      "phrase": "Начни",
+      "attempt": 9,
+      "condition": "normal",
+      "text": null,
+      "matched": false,
+      "wall_ms": 8066,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Остановить",
+      "attempt": 0,
+      "condition": "normal",
+      "text": "Остановить. Остановить.",
+      "matched": false,
+      "wall_ms": 10400,
+      "inference_ms": 10381.488277,
+      "avg_logprob": -0.415793,
+      "no_speech_prob": 1e-06,
+      "current_parser_matches": true,
+      "routed_command": "stop"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Останови",
+      "attempt": 1,
+      "condition": "quiet",
+      "text": null,
+      "matched": false,
+      "wall_ms": 8263,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Стоп",
+      "attempt": 2,
+      "condition": "added_noise",
+      "text": "Стоп.",
+      "matched": true,
+      "wall_ms": 9467,
+      "inference_ms": 9060.378538,
+      "avg_logprob": -0.137402,
+      "no_speech_prob": 1e-06,
+      "current_parser_matches": true,
+      "routed_command": "stop"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Остановить обнаружение",
+      "attempt": 3,
+      "condition": "normal",
+      "text": null,
+      "matched": false,
+      "wall_ms": 10222,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Остановить",
+      "attempt": 4,
+      "condition": "quiet",
+      "text": "Остановить. Остановить.",
+      "matched": false,
+      "wall_ms": 10979,
+      "inference_ms": 10337.472705,
+      "avg_logprob": -0.446542,
+      "no_speech_prob": 3e-06,
+      "current_parser_matches": true,
+      "routed_command": "stop"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Останови",
+      "attempt": 5,
+      "condition": "added_noise",
+      "text": null,
+      "matched": false,
+      "wall_ms": 9467,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Стоп",
+      "attempt": 6,
+      "condition": "normal",
+      "text": "Стоп.",
+      "matched": true,
+      "wall_ms": 9376,
+      "inference_ms": 8690.09083,
+      "avg_logprob": -0.064757,
+      "no_speech_prob": 0.0,
+      "current_parser_matches": true,
+      "routed_command": "stop"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Остановить обнаружение",
+      "attempt": 7,
+      "condition": "quiet",
+      "text": null,
+      "matched": false,
+      "wall_ms": 11079,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Остановить",
+      "attempt": 8,
+      "condition": "added_noise",
+      "text": "Остоновить. Остоновить.",
+      "matched": false,
+      "wall_ms": 10830,
+      "inference_ms": 10161.624527,
+      "avg_logprob": -0.551657,
+      "no_speech_prob": 0.000112,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "stop",
+      "phrase": "Останови",
+      "attempt": 9,
+      "condition": "normal",
+      "text": "Останови.",
+      "matched": true,
+      "wall_ms": 9165,
+      "inference_ms": 9157.380986,
+      "avg_logprob": -0.275192,
+      "no_speech_prob": 8.5e-05,
+      "current_parser_matches": true,
+      "routed_command": "stop"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что впереди",
+      "attempt": 0,
+      "condition": "normal",
+      "text": null,
+      "matched": false,
+      "wall_ms": 5474,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что передо мной",
+      "attempt": 1,
+      "condition": "quiet",
+      "text": "Стоп передо мной.",
+      "matched": false,
+      "wall_ms": 9216,
+      "inference_ms": 9200.177549,
+      "avg_logprob": -0.341295,
+      "no_speech_prob": 0.000463,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что ты видишь",
+      "attempt": 2,
+      "condition": "added_noise",
+      "text": null,
+      "matched": false,
+      "wall_ms": 8085,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Опиши окружение",
+      "attempt": 3,
+      "condition": "normal",
+      "text": "Опиши окружение.",
+      "matched": true,
+      "wall_ms": 9826,
+      "inference_ms": 9821.536454,
+      "avg_logprob": -0.226455,
+      "no_speech_prob": 3.9e-05,
+      "current_parser_matches": true,
+      "routed_command": "describe"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что впереди",
+      "attempt": 4,
+      "condition": "quiet",
+      "text": null,
+      "matched": false,
+      "wall_ms": 8693,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что передо мной",
+      "attempt": 5,
+      "condition": "added_noise",
+      "text": "Что передо мной? Что передо мной?",
+      "matched": false,
+      "wall_ms": 10260,
+      "inference_ms": 9606.892028,
+      "avg_logprob": -0.1859,
+      "no_speech_prob": 1e-06,
+      "current_parser_matches": true,
+      "routed_command": "describe"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что ты видишь",
+      "attempt": 6,
+      "condition": "normal",
+      "text": "Что ты видишь? Что ты видишь?",
+      "matched": false,
+      "wall_ms": 10228,
+      "inference_ms": 10214.85109,
+      "avg_logprob": -0.151221,
+      "no_speech_prob": 1.1e-05,
+      "current_parser_matches": true,
+      "routed_command": "describe"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Опиши окружение",
+      "attempt": 7,
+      "condition": "quiet",
+      "text": "Опиши окружение.",
+      "matched": true,
+      "wall_ms": 11305,
+      "inference_ms": 9822.60458,
+      "avg_logprob": -0.183656,
+      "no_speech_prob": 3.2e-05,
+      "current_parser_matches": true,
+      "routed_command": "describe"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что впереди",
+      "attempt": 8,
+      "condition": "added_noise",
+      "text": null,
+      "matched": false,
+      "wall_ms": 10075,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "describe",
+      "phrase": "Что передо мной",
+      "attempt": 9,
+      "condition": "normal",
+      "text": "Стоп передо мной.",
+      "matched": false,
+      "wall_ms": 9858,
+      "inference_ms": 9350.685726,
+      "avg_logprob": -0.402653,
+      "no_speech_prob": 0.0,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Повтори",
+      "attempt": 0,
+      "condition": "normal",
+      "text": null,
+      "matched": false,
+      "wall_ms": 9438,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Повторить",
+      "attempt": 1,
+      "condition": "quiet",
+      "text": "Повторит.",
+      "matched": false,
+      "wall_ms": 9399,
+      "inference_ms": 9286.692184,
+      "avg_logprob": -0.265679,
+      "no_speech_prob": 0.0,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Ещё раз",
+      "attempt": 2,
+      "condition": "added_noise",
+      "text": "Ещё раз.",
+      "matched": true,
+      "wall_ms": 9180,
+      "inference_ms": 9174.186559,
+      "avg_logprob": -0.168982,
+      "no_speech_prob": 6.5e-05,
+      "current_parser_matches": true,
+      "routed_command": "repeat"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Скажи снова",
+      "attempt": 3,
+      "condition": "normal",
+      "text": null,
+      "matched": false,
+      "wall_ms": 5417,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Повтори",
+      "attempt": 4,
+      "condition": "quiet",
+      "text": "Повтори. Повтори.",
+      "matched": false,
+      "wall_ms": 10020,
+      "inference_ms": 9991.67458,
+      "avg_logprob": -0.584093,
+      "no_speech_prob": 7e-05,
+      "current_parser_matches": true,
+      "routed_command": "repeat"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Повторить",
+      "attempt": 5,
+      "condition": "added_noise",
+      "text": null,
+      "matched": false,
+      "wall_ms": 7992,
+      "inference_ms": null,
+      "avg_logprob": null,
+      "no_speech_prob": null,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Ещё раз",
+      "attempt": 6,
+      "condition": "normal",
+      "text": "Ещё раз.",
+      "matched": true,
+      "wall_ms": 9049,
+      "inference_ms": 9035.76833,
+      "avg_logprob": -0.063264,
+      "no_speech_prob": 5e-06,
+      "current_parser_matches": true,
+      "routed_command": "repeat"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Скажи снова",
+      "attempt": 7,
+      "condition": "quiet",
+      "text": "Скажи снова.",
+      "matched": true,
+      "wall_ms": 9094,
+      "inference_ms": 9078.926402,
+      "avg_logprob": -0.053885,
+      "no_speech_prob": 7.9e-05,
+      "current_parser_matches": true,
+      "routed_command": "repeat"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Повтори",
+      "attempt": 8,
+      "condition": "added_noise",
+      "text": "Повтори. Повтори.",
+      "matched": false,
+      "wall_ms": 11077,
+      "inference_ms": 9619.004267,
+      "avg_logprob": -0.387674,
+      "no_speech_prob": 3.4e-05,
+      "current_parser_matches": true,
+      "routed_command": "repeat"
+    },
+    {
+      "expected": "repeat",
+      "phrase": "Повторить",
+      "attempt": 9,
+      "condition": "normal",
+      "text": "Повторит.",
+      "matched": false,
+      "wall_ms": 9416,
+      "inference_ms": 9410.554788,
+      "avg_logprob": -0.257769,
+      "no_speech_prob": 2.3e-05,
+      "current_parser_matches": false,
+      "routed_command": "unknown"
+    }
+  ],
+  "accuracy": [
+    {
+      "correct": 13,
+      "total": 40,
+      "source": "synthetic Android offline TTS; no acoustic microphone loop"
+    }
+  ],
+  "unknown": [
+    {
+      "phrase": "Какая сегодня погода",
+      "text": "Какая сегодня погода.",
+      "command": "unknown"
+    },
+    {
+      "phrase": "Не начинай",
+      "text": "Нелочиной.",
+      "command": "unknown"
+    },
+    {
+      "phrase": "Не останавливай",
+      "text": "Не останавливай.",
+      "command": "unknown"
+    },
+    {
+      "phrase": "Привет",
+      "text": "Привет! Привет!",
+      "command": "unknown"
+    }
+  ],
+  "performance": [
+    {
+      "whisper_active": false,
+      "window_ms": 20009,
+      "results": 86,
+      "results_per_second": 4.2980658703583385,
+      "rss_bytes": 552935424,
+      "yolo_p50_ms": 179.094,
+      "yolo_p95_ms": 263.41
+    },
+    {
+      "whisper_active": true,
+      "window_ms": 20018,
+      "results": 69,
+      "results_per_second": 3.4468977919872117,
+      "rss_bytes": 559296512,
+      "yolo_p50_ms": 234.334,
+      "yolo_p95_ms": 376.287
+    },
+    {
+      "whisper_active": true,
+      "window_ms": 20002,
+      "results": 70,
+      "results_per_second": 3.4996500349965003,
+      "rss_bytes": 559288320,
+      "yolo_p50_ms": 241.333,
+      "yolo_p95_ms": 327.284
+    },
+    {
+      "whisper_active": false,
+      "window_ms": 20003,
+      "results": 82,
+      "results_per_second": 4.099385092236164,
+      "rss_bytes": 563077120,
+      "yolo_p50_ms": 202.212,
+      "yolo_p95_ms": 294.442
+    }
+  ],
+  "silence": [
+    {
+      "text": null
+    }
+  ],
+  "record_cancel": [
+    {
+      "result": null,
+      "state": "idle",
+      "opened": true
+    }
+  ],
+  "complete": [
+    {
+      "status": "complete"
+    }
+  ],
+  "efficiency_performance": [
+    {
+      "whisper_active": false,
+      "window_ms": 20012,
+      "results": 97,
+      "results_per_second": 4.847091744953028,
+      "rss_bytes": 538640384,
+      "yolo_p50_ms": 165.988,
+      "yolo_p95_ms": 244.445
+    },
+    {
+      "whisper_active": true,
+      "window_ms": 20010,
+      "results": 88,
+      "results_per_second": 4.397801099450275,
+      "rss_bytes": 536518656,
+      "yolo_p50_ms": 182.702,
+      "yolo_p95_ms": 285.529
+    },
+    {
+      "whisper_active": true,
+      "window_ms": 20009,
+      "results": 83,
+      "results_per_second": 4.148133339997002,
+      "rss_bytes": 545849344,
+      "yolo_p50_ms": 196.619,
+      "yolo_p95_ms": 258.708
+    },
+    {
+      "whisper_active": false,
+      "window_ms": 20003,
+      "results": 90,
+      "results_per_second": 4.499325101234815,
+      "rss_bytes": 546140160,
+      "yolo_p50_ms": 173.14,
+      "yolo_p95_ms": 265.383
+    }
+  ],
+  "efficiency_record_cancel": [
+    {
+      "result": null,
+      "state": "idle",
+      "opened": true
+    }
+  ],
+  "efficiency_complete": [
+    {
+      "status": "complete"
+    }
+  ],
+  "efficiency_affinity_confirmed": true,
+  "metadata": {
+    "date": "2026-11-18",
+    "device": "CPH2727 Android 16 ARM64",
+    "runtime": "whisper.cpp v1.9.5 d1be6fde11ac6e0407606b4e42fe72d34add8037",
+    "model": "ggml-tiny.bin multilingual FP16, unquantized",
+    "audio_context": 512,
+    "threads": 1,
+    "decoder": "beam search 5, timestamps enabled, Russian command vocabulary prompt",
+    "radio_states_during_tests": {
+      "wifi_on": 0,
+      "mobile_data": 0
+    },
+    "flutter_tests": 105,
+    "flutter_analyze": "no issues",
+    "scope": "Native Android synthetic TTS fixtures. No live human accuracy claim. The 40 ASR outputs precede affinity adjustment; comparison windows were rerun after affinity."
+  },
+  "performance_summary": {
+    "idle": 4.198740377886634,
+    "active": 3.473263368315842,
+    "throughput_drop_percent": 17.27844411127769
+  },
+  "efficiency_performance_summary": {
+    "idle": 4.673247532175434,
+    "active": 4.272970339088933,
+    "throughput_drop_percent": 8.565289776126395
+  },
+  "pre_affinity_recognition_ms": {
+    "n": 24,
+    "p50": 9350.685726,
+    "p95": 10337.472705,
+    "max": 10381.488277
+  },
+  "parser_replay": {
+    "correct": 19,
+    "total": 40,
+    "decoded": 24,
+    "correct_decoded": 19,
+    "by_class": {
+      "start": [
+        5,
+        10
+      ],
+      "stop": [
+        5,
+        10
+      ],
+      "describe": [
+        4,
+        10
+      ],
+      "repeat": [
+        5,
+        10
+      ]
+    },
+    "scope": "Current pure Dart parser applied to native Android transcripts; not live UI execution"
+  },
+  "release_smoke": {
+    "installed": true,
+    "native_load_ms": 695.344895,
+    "jni_library_loaded": true,
+    "background_cancel_and_resume_idle_ui": true,
+    "wifi_restored": true,
+    "mobile_data_restored": true,
+    "screen_timeout_restored": true,
+    "apk_sha256": "17bdc1c38b359573c7ec5b77356860897d7d90179de588e52c5c44635e5e3535",
+    "apk_bytes": 176787350
+  }
+}

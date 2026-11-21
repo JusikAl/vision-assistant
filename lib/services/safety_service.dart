@@ -1,5 +1,7 @@
 import 'dart:math' as math;
 
+import 'smart_scene_analyzer.dart';
+
 /// Visual observation, not a claim of collision risk or a movement instruction.
 class SafetyAlert {
   const SafetyAlert({
@@ -8,13 +10,20 @@ class SafetyAlert {
     required this.priority,
     required this.observedAt,
     this.confidence = 0,
+    this.firstResultAt,
+    this.firstCameraAt,
+    this.confirmedAt,
+    this.riskScore = 0,
   });
 
+  String get cooldownKey => priority == 3 ? key : key.split(':').first;
   final String key;
   final String text;
   final int priority;
   final DateTime observedAt;
   final double confidence;
+  final double riskScore;
+  final DateTime? firstResultAt, firstCameraAt, confirmedAt;
 }
 
 class _Rule {
@@ -52,19 +61,48 @@ class _Box {
 }
 
 class _Track {
-  _Track(this.name, this.box, this.side, this.firstSeen, this.lastSeen);
+  _Track(
+    this.id,
+    this.name,
+    this.box,
+    this.side,
+    this.firstSeen,
+    this.lastSeen,
+    this.firstCameraAt,
+  );
+  final int id;
   final String name;
   _Box box;
   String side;
-  final DateTime firstSeen;
+  final DateTime firstSeen, firstCameraAt;
   DateTime lastSeen;
+  DateTime? confirmedAt;
   int frames = 1;
+  int missed = 0;
 }
 
 /// Mobile adaptation of backend/safety_service.py. One shared policy is used
 /// for offline and connected detections; server depth/UI/protocol stay intact.
 class SafetyService {
-  SafetyService({DateTime Function()? clock}) : _clock = clock ?? DateTime.now;
+  SafetyService({DateTime Function()? clock, SmartSceneAnalyzer? analyzer})
+    : _clock = clock ?? DateTime.now,
+      _analyzer = analyzer ?? SmartSceneAnalyzer();
+  final SmartSceneAnalyzer _analyzer;
+  int _nextTrackId = 0;
+  List<SafetyAlert> _scene = const [];
+  String describeScene() {
+    final now = _clock();
+    final fresh = _scene
+        .where(
+          (a) =>
+              !now.isBefore(a.observedAt) &&
+              now.difference(a.observedAt) <= maxFrameGap,
+        )
+        .take(3);
+    return fresh.isEmpty
+        ? 'Нет свежих подтверждённых объектов'
+        : 'На последнем обработанном кадре: ${fresh.map((a) => a.text).join('; ')}';
+  }
 
   final DateTime Function() _clock;
   final List<_Track> _tracks = [];
@@ -101,6 +139,8 @@ class SafetyService {
 
   void reset() {
     _tracks.clear();
+    _analyzer.reset();
+    _scene = const [];
     _width = _height = 0;
   }
 
@@ -125,7 +165,7 @@ class SafetyService {
     final now = _clock();
     final previous = List<_Track>.of(_tracks);
     _tracks.clear();
-    final alerts = <String, SafetyAlert>{};
+    final observations = <SceneObject>[];
     // Bounded work, even if a malformed server response contains huge lists.
     for (final detection in detections.take(80)) {
       if (detection is! Map) continue;
@@ -154,6 +194,10 @@ class SafetyService {
         continue;
       }
       final box = _Box(x1, y1, x2, y2);
+      // Duplicate boxes are not independent tracks.
+      if (_tracks.any((t) => t.name == name && box.overlap(t.box) > .85)) {
+        continue;
+      }
       _Track? match;
       var bestOverlap = -1.0;
       for (final track in previous) {
@@ -174,18 +218,28 @@ class SafetyService {
       if (match != null) {
         previous.remove(match); // one-to-one matching of same-class objects
         track = match;
-        track.side = _side(box.cx, track.side);
+        track.missed = 0;
+        track.side = _analyzer.side(box.cx, track.side);
         track.box = box;
         if (now.isAfter(track.lastSeen)) track.frames++;
         track.lastSeen = now;
       } else {
-        track = _Track(name, box, _side(box.cx), now, now);
+        track = _Track(
+          ++_nextTrackId,
+          name,
+          box,
+          _analyzer.side(box.cx),
+          now,
+          now,
+          now.subtract(Duration(microseconds: (frameAgeMs * 1000).round())),
+        );
       }
       _tracks.add(track);
       if (track.frames < confirmationFrames ||
           now.difference(track.firstSeen) < minConfirmationTime) {
         continue;
       }
+      track.confirmedAt ??= now;
       final key = '$name:${track.side}';
       final position = switch (track.side) {
         'left' => 'Слева',
@@ -206,35 +260,39 @@ class SafetyService {
           Duration(microseconds: (frameAgeMs * 1000).round()),
         ),
         confidence: confidence.toDouble(),
+        firstResultAt: track.firstSeen,
+        firstCameraAt: track.firstCameraAt,
+        confirmedAt: track.confirmedAt,
       );
-      if (!alerts.containsKey(key) || alerts[key]!.confidence < confidence) {
-        alerts[key] = alert;
-      }
+      observations.add(
+        SceneObject(
+          trackId: track.id,
+          className: name,
+          side: track.side,
+          stability: track.frames,
+          alert: alert,
+        ),
+      );
     }
-    final result = alerts.values.toList()
-      ..sort((a, b) {
-        final priority = b.priority.compareTo(a.priority);
-        if (priority != 0) return priority;
-        final center =
-            (b.key.endsWith(':center') ? 1 : 0) -
-            (a.key.endsWith(':center') ? 1 : 0);
-        return center != 0 ? center : b.confidence.compareTo(a.confidence);
-      });
-    return result.take(3).toList(growable: false);
-  }
-
-  static String _side(double center, [String? previous]) {
-    // Hysteresis stops a box near a third boundary alternating left/center.
-    if (previous == 'left' && center < 0.38) return 'left';
-    if (previous == 'right' && center > 0.62) return 'right';
-    if (previous == 'center' && center >= 0.28 && center <= 0.72) {
-      return 'center';
+    // Keep confirmed IDs across one partial-result dropout. No new observation
+    // or confirmation is manufactured for an absent box.
+    if (_tracks.isNotEmpty) {
+      _tracks.addAll(
+        previous.where((track) {
+          final age = now.difference(track.lastSeen);
+          if (track.confirmedAt == null ||
+              track.missed != 0 ||
+              age.isNegative ||
+              age > maxFrameGap) {
+            return false;
+          }
+          track.missed++;
+          return true;
+        }),
+      );
     }
-    return center < 0.33
-        ? 'left'
-        : center > 0.67
-        ? 'right'
-        : 'center';
+    _scene = _analyzer.analyze(observations, now);
+    return _scene;
   }
 
   /// Current server distance_m alone is experimental and is NOT sufficient.

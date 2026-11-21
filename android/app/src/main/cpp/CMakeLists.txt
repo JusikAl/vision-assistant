@@ -1,0 +1,17 @@
+cmake_minimum_required(VERSION 3.22)
+project(navigation_whisper LANGUAGES C CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+# Flutter profile maps native targets to Debug. Inference kernels still need
+# optimization; -O3 is deliberately applied to all vendored CPU targets.
+add_compile_options(-O3)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+set(WHISPER_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(WHISPER_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(WHISPER_BUILD_SERVER OFF CACHE BOOL "" FORCE)
+set(GGML_OPENMP OFF CACHE BOOL "" FORCE)
+set(GGML_NATIVE OFF CACHE BOOL "" FORCE)
+set(GGML_BACKEND_DL OFF CACHE BOOL "" FORCE)
+add_subdirectory(../../../../../third_party/whisper_cpp whisper-build)
+add_library(navigation_whisper SHARED whisper_jni.cpp)
+target_link_libraries(navigation_whisper PRIVATE whisper android log)

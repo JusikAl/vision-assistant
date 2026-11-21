@@ -1,0 +1,152 @@
+{
+  "device": "CPH2727",
+  "mode": "offline profile",
+  "sessions": [
+    {
+      "session": 1,
+      "n": 38,
+      "rss_bytes": 368267264,
+      "measurement_ms": 8036,
+      "native_snapshot": {
+        "camera_packing": {
+          "nanos": 196140001,
+          "calls": 39
+        },
+        "cpu_ms": 42566,
+        "java_allocated_bytes": 208489936,
+        "java_gc_count": 20,
+        "java_gc_ms": 1320,
+        "native_heap_bytes": 111468272,
+        "pss_kb": 246143
+      },
+      "cpu_ms_delta": 26733,
+      "java_allocated_bytes_delta": 166093776,
+      "java_gc_count_delta": 19,
+      "java_gc_ms_delta": 1258,
+      "native_packing_calls": 37,
+      "native_packing_ms_avg": 3.450757324324324,
+      "inference_ms_p50": 164.119,
+      "inference_ms_p95": 314.521,
+      "frame_ms_p50": 171.854,
+      "frame_ms_p95": 334.36,
+      "camera_to_result_ms_p50": 171.944,
+      "camera_to_result_ms_p95": 334.442,
+      "preprocess_ms_p50": 4.308,
+      "preprocess_ms_p95": 16.08,
+      "postprocess_ms_p50": 1.091,
+      "postprocess_ms_p95": 2.234
+    },
+    {
+      "session": 2,
+      "n": 41,
+      "rss_bytes": 364445696,
+      "measurement_ms": 8037,
+      "native_snapshot": {
+        "camera_packing": {
+          "nanos": 336292917,
+          "calls": 81
+        },
+        "cpu_ms": 71602,
+        "java_allocated_bytes": 397411024,
+        "java_gc_count": 43,
+        "java_gc_ms": 2667,
+        "native_heap_bytes": 111207552,
+        "pss_kb": 241874
+      },
+      "cpu_ms_delta": 27567,
+      "java_allocated_bytes_delta": 184063664,
+      "java_gc_count_delta": 22,
+      "java_gc_ms_delta": 1282,
+      "native_packing_calls": 41,
+      "native_packing_ms_avg": 3.3413401707317076,
+      "inference_ms_p50": 156.159,
+      "inference_ms_p95": 219.193,
+      "frame_ms_p50": 165.832,
+      "frame_ms_p95": 226.121,
+      "camera_to_result_ms_p50": 165.911,
+      "camera_to_result_ms_p95": 226.213,
+      "preprocess_ms_p50": 4.525,
+      "preprocess_ms_p95": 17.502,
+      "postprocess_ms_p50": 1.212,
+      "postprocess_ms_p95": 3.493
+    },
+    {
+      "session": 3,
+      "n": 2556,
+      "rss_bytes": 357421056,
+      "measurement_ms": 600041,
+      "native_snapshot": {
+        "camera_packing": {
+          "nanos": 10234824535,
+          "calls": 2638
+        },
+        "cpu_ms": 2099671,
+        "java_allocated_bytes": 11936583792,
+        "java_gc_count": 1392,
+        "java_gc_ms": 97460,
+        "native_heap_bytes": 111212800,
+        "pss_kb": 237644
+      },
+      "cpu_ms_delta": 2026787,
+      "java_allocated_bytes_delta": 11534315728,
+      "java_gc_count_delta": 1348,
+      "java_gc_ms_delta": 94754,
+      "native_packing_calls": 2556,
+      "native_packing_ms_avg": 3.8710366553208138,
+      "inference_ms_p50": 175.745,
+      "inference_ms_p95": 253.691,
+      "frame_ms_p50": 187.998,
+      "frame_ms_p95": 265.167,
+      "camera_to_result_ms_p50": 188.08,
+      "camera_to_result_ms_p95": 265.24,
+      "preprocess_ms_p50": 5.666,
+      "preprocess_ms_p95": 16.722,
+      "postprocess_ms_p50": 1.272,
+      "postprocess_ms_p95": 2.402
+    }
+  ],
+  "new_results_per_second": [
+    4.604280736684918,
+    4.976981460744058,
+    4.258042367104914
+  ],
+  "complete": true,
+  "smoke_errors": 0,
+  "sampled_safety_ms": {
+    "n": 90,
+    "p50": 0.057,
+    "p95": 0.125,
+    "max": 0.375
+  },
+  "tts_start_samples": 3,
+  "automated_tests_passed": 84,
+  "analyzer_issues": 0,
+  "baseline_source": "offline_safety_v5_report.md (historical, not paired)",
+  "baseline_yolo_results_per_second": 3.261,
+  "tts_start_evidence": [
+    {
+      "key": "car:center",
+      "repeat": "false",
+      "result_to_confirmation_ms": 434.131,
+      "confirmation_to_tts_ms": 843.986,
+      "camera_to_tts_ms": 1567.33,
+      "evidence_age_at_tts_ms": 1223.972
+    },
+    {
+      "key": "person:center",
+      "repeat": "false",
+      "result_to_confirmation_ms": 242.043,
+      "confirmation_to_tts_ms": 719.506,
+      "camera_to_tts_ms": 1207.205,
+      "evidence_age_at_tts_ms": 916.037
+    },
+    {
+      "key": "person:left",
+      "repeat": "true",
+      "result_to_confirmation_ms": 208.59,
+      "confirmation_to_tts_ms": 1069.563,
+      "camera_to_tts_ms": 1451.77,
+      "evidence_age_at_tts_ms": 1237.975
+    }
+  ]
+}

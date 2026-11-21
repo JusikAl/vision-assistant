@@ -1,0 +1,40 @@
+{
+  "device": "CPH2727",
+  "date": "2026-11-20",
+  "android": "16",
+  "abi": "arm64-v8a",
+  "historical_evidence_sha256": {
+    "docs/vosk_human_validation.json": "ab956cad47b2a24ec724451e888321a14515bdb0eaaba05471f1418e63765f20",
+    "docs/vosk_human_summary.json": "0d813de1230f81c9e983059f916e375f67e7fe5312c095ac8201e8bf032c290f",
+    "docs/vosk_native_events.jsonl": "489f28739482f2b081dca3bd4d9214e7834e7f6511d7e1454e09013339c48da0",
+    "docs/vosk_offline_report.md": "af98a5995039f7dcc6f750ca44021b907a8d4dfeed2e46c062e5763b7f906f51"
+  },
+  "artifacts": {
+    "human-release.apk": {
+      "sha256": "0f8d3e9c156a11c1848b9b9e23264264bef6808d5f42d72c45616bb065501f1a",
+      "bytes": 175218069
+    },
+    "perf-release.apk": {
+      "sha256": "4b124d7ee9f0e841524beb13a0358b62b68d2a3b9d74ecb80ab9451acc87a345",
+      "bytes": 175218069
+    },
+    "production-release.apk": {
+      "sha256": "ab5d4d99e4100ec1987488d3ccad7f2953994505babaa77bdf32003bb8aee356",
+      "bytes": 175021461
+    },
+    "replay-release.apk": {
+      "sha256": "d0bf80fb580790a799445e5d52f44fced1c7088efa2a767f2c224544ef8fcd59",
+      "bytes": 173513721
+    }
+  },
+  "restored_on_device": "production-release.apk",
+  "production_voice_actions_default": false,
+  "production_audio_capture_default": false,
+  "historical_evidence_unchanged": true,
+  "human_acceptance": {
+    "release": true,
+    "trials": 80,
+    "suite": "TZ7.2",
+    "configuration": "v2-context-guards; endpoint_end_s=0.9; nbest=3; PCM16/16000/mono; block=200ms"
+  }
+}

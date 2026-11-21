@@ -104,6 +104,66 @@ void main() {
     });
   }
 
+  speechTest('group count and side changes share the class cooldown', (
+    tester,
+  ) async {
+    service.onFrame([alert('person:left', 1)]);
+    await tester.pump();
+    native.complete();
+    await tester.pump();
+    service.onFrame([alert('person:group', 1)]);
+    await tester.pump();
+    service.onFrame([alert('person:right', 1)]);
+    await tester.pump();
+    expect(native.spoken, ['person:left']);
+  });
+
+  speechTest('new critical track bypasses another track cooldown', (
+    tester,
+  ) async {
+    service.onFrame([alert('stairs:track:1', 3)]);
+    await tester.pump();
+    native.complete();
+    await tester.pump();
+    service.onFrame([alert('stairs:track:1', 3), alert('stairs:track:2', 3)]);
+    await tester.pump();
+    expect(native.spoken, ['stairs:track:1', 'stairs:track:2']);
+    expect(native.maxActive, 1);
+  });
+
+  speechTest(
+    'voice operation defers information but critical warnings still speak',
+    (tester) async {
+      service.deferAlert = (priority) => priority == 1;
+      service.onFrame([alert('person', 1)]);
+      await tester.pump();
+      expect(native.spoken, isEmpty);
+      service.onFrame([alert('person', 1), alert('stairs', 3)]);
+      await tester.pump();
+      expect(native.spoken, ['stairs']);
+    },
+  );
+
+  speechTest('repeated history does not accumulate repeat prefixes', (
+    tester,
+  ) async {
+    final original = service.speakMessage('previous scene');
+    await tester.pump();
+    expect(service.lastSpokenText, 'previous scene');
+    native.complete();
+    await tester.pump();
+    await original;
+    final repeat = service.speakMessage(
+      'repeat: previous scene',
+      remember: false,
+    );
+    await tester.pump();
+    expect(service.lastSpokenText, 'previous scene');
+    native.complete();
+    await tester.pump();
+    await repeat;
+  });
+
   speechTest('one offline voice, one engine, strongest alert first', (
     tester,
   ) async {
@@ -443,5 +503,35 @@ void main() {
     native.complete();
     await tester.pump();
     await reply;
+  });
+  speechTest('warning expires while waiting for microphone release', (
+    tester,
+  ) async {
+    final gate = Completer<void>();
+    service.onSpeakingChanged = (speaking) async {
+      if (speaking) await gate.future;
+    };
+    service.onFrame([alert('stairs', 3)]);
+    await tester.pump();
+    now = now.add(const Duration(milliseconds: 1900));
+    // Advance the evidence clock without firing the expiry timer: freshness
+    // must also be checked synchronously after the asynchronous audio handoff.
+    gate.complete();
+    await tester.pump();
+    expect(native.spoken, isEmpty);
+  });
+  speechTest('disappeared warning is discarded after microphone handoff', (
+    tester,
+  ) async {
+    final gate = Completer<void>();
+    service.onSpeakingChanged = (speaking) async {
+      if (speaking) await gate.future;
+    };
+    service.onFrame([alert('stairs', 3)]);
+    await tester.pump();
+    service.onFrame([]);
+    gate.complete();
+    await tester.pump();
+    expect(native.spoken, isEmpty);
   });
 }

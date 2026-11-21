@@ -1,0 +1,202 @@
+{
+  "rows": [
+    {
+      "image_id": 1,
+      "sha256": "5392602083a5e448bd2dca51c9d1c00c3abb03d11c83b6ccd7e6221a65ef7139",
+      "cold": false,
+      "captured_at": "2026-11-20T19:16:57.602896+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795202217602918300-1",
+        "status": "success",
+        "description": "На снимке видны ровные, горизонтальные полосы, напоминающие ступени или лестницу. Слева и справа от центра расположены светлые и темные участки, возможно, это текстура или трещины на поверхности. В центре изображения виден участок с более гладкой поверхностью, возможно, это часть ступени или полосы. Изображение размытое, но основные элементы видны.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:16:57.602896+00:00",
+        "processing_ms": 3231.23,
+        "preprocessing_ms": 15.6,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 25.38,
+          "prompt_eval_ms": 195.95,
+          "eval_ms": 1298.86,
+          "total_ms": 2798.41
+        }
+      },
+      "http_total_ms": 3263.0586999002844
+    },
+    {
+      "image_id": 5,
+      "sha256": "ab89edf637d9ba8c1aed8e8ca8780ab6c1e8fd418a480b28df9834f572203b15",
+      "cold": false,
+      "captured_at": "2026-11-20T19:17:00.867474+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795202220867513900-5",
+        "status": "success",
+        "description": "На снимке изображена современная стулья с мягким сиденьем и спинкой, выполненная в сером цвете с черными металлическими ножками. Стулья расположены в центре, на белом фоне, что указывает на студийную съемку.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:17:00.867474+00:00",
+        "processing_ms": 1819.61,
+        "preprocessing_ms": 7.58,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 6.41,
+          "prompt_eval_ms": 9.63,
+          "eval_ms": 694.4,
+          "total_ms": 1495.62
+        }
+      },
+      "http_total_ms": 1830.0330999772996
+    },
+    {
+      "image_id": 11,
+      "sha256": "2c7b5cf6b7ee8e6eaaec2bc4ee513848bad3dc0705199141202376ae1233cfb7",
+      "cold": false,
+      "captured_at": "2026-11-20T19:17:02.698438+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795202222698460600-11",
+        "status": "success",
+        "description": "На снимке видна улица с пешеходным переходом, на котором идут люди. Слева и справа от перехода видны дороги, а впереди — пешеходы, переходящие через зону. Сцена выглядит как городская улица, возможно, в дождь или с пылью.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:17:02.698438+00:00",
+        "processing_ms": 1872.38,
+        "preprocessing_ms": 11.79,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 15.25,
+          "prompt_eval_ms": 9.96,
+          "eval_ms": 850.27,
+          "total_ms": 1511.27
+        }
+      },
+      "http_total_ms": 1882.3947999626398
+    }
+  ],
+  "resource_samples": [
+    {
+      "t": 782205.985514,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_and_llama_rss_bytes": 1079840768,
+      "cpu_core_percent": 0.0,
+      "backend_rss_bytes": 40771584,
+      "system_ram_used_bytes": 13770186752
+    },
+    {
+      "t": 782206.5784721,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_and_llama_rss_bytes": 1079840768,
+      "cpu_core_percent": 0.0,
+      "backend_rss_bytes": 42647552,
+      "system_ram_used_bytes": 13846585344
+    },
+    {
+      "t": 782207.2085963,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 84,
+      "ollama_and_llama_rss_bytes": 1267220480,
+      "cpu_core_percent": 44.63405785581563,
+      "backend_rss_bytes": 46751744,
+      "system_ram_used_bytes": 14137913344
+    },
+    {
+      "t": 782207.8553592,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 13,
+      "ollama_and_llama_rss_bytes": 1357029376,
+      "cpu_core_percent": 62.81281748934507,
+      "backend_rss_bytes": 46751744,
+      "system_ram_used_bytes": 14297247744
+    },
+    {
+      "t": 782208.4608816,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 11,
+      "ollama_and_llama_rss_bytes": 1244925952,
+      "cpu_core_percent": 61.9299963138178,
+      "backend_rss_bytes": 46755840,
+      "system_ram_used_bytes": 14337417216
+    },
+    {
+      "t": 782209.0948773,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 82,
+      "ollama_and_llama_rss_bytes": 1111965696,
+      "cpu_core_percent": 96.11658250492428,
+      "backend_rss_bytes": 46755840,
+      "system_ram_used_bytes": 14390579200
+    },
+    {
+      "t": 782209.6893663,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 88,
+      "ollama_and_llama_rss_bytes": 1110282240,
+      "cpu_core_percent": 94.61907620879997,
+      "backend_rss_bytes": 47120384,
+      "system_ram_used_bytes": 14464147456
+    },
+    {
+      "t": 782210.2849103,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 15,
+      "ollama_and_llama_rss_bytes": 1315278848,
+      "cpu_core_percent": 36.73112313874003,
+      "backend_rss_bytes": 47247360,
+      "system_ram_used_bytes": 14768156672
+    },
+    {
+      "t": 782210.8710479,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 2,
+      "ollama_and_llama_rss_bytes": 1246527488,
+      "cpu_core_percent": 47.98361341277828,
+      "backend_rss_bytes": 47251456,
+      "system_ram_used_bytes": 14719090688
+    },
+    {
+      "t": 782211.4698807,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 86,
+      "ollama_and_llama_rss_bytes": 1247793152,
+      "cpu_core_percent": 104.36970051483843,
+      "backend_rss_bytes": 47255552,
+      "system_ram_used_bytes": 14745120768
+    },
+    {
+      "t": 782212.0602134,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_and_llama_rss_bytes": 1419075584,
+      "cpu_core_percent": 31.76175061659397,
+      "backend_rss_bytes": 49070080,
+      "system_ram_used_bytes": 14921900032
+    },
+    {
+      "t": 782212.6373527,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 3,
+      "ollama_and_llama_rss_bytes": 1365831680,
+      "cpu_core_percent": 59.56101066636318,
+      "backend_rss_bytes": 49070080,
+      "system_ram_used_bytes": 14857203712
+    },
+    {
+      "t": 782213.2503661,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 84,
+      "ollama_and_llama_rss_bytes": 1231917056,
+      "cpu_core_percent": 101.9553569305856,
+      "backend_rss_bytes": 49070080,
+      "system_ram_used_bytes": 14962671616
+    }
+  ],
+  "cold_request": "qwen3_vl_first_real_image.json",
+  "expected_trials": 3,
+  "rss_scope": "Ollama app + Ollama API server + llama-server; sum of Windows working sets, not unique RAM",
+  "complete": true
+}

@@ -1,0 +1,60 @@
+{
+  "date_local": "2026-11-21",
+  "timezone": "Asia/Qyzylorda",
+  "device": {
+    "model": "CPH2727",
+    "android": "16",
+    "abi": "arm64-v8a"
+  },
+  "model": "qwen3-vl:2b-instruct",
+  "ollama_version": "0.40.13",
+  "artifacts": {
+    "perf-release.apk": {
+      "sha256": "dc271e8d55c883c8f8aed07ec504cb768662fe5edcbee99aa4338e69477c3e72",
+      "bytes": 175611477
+    },
+    "production-release.apk": {
+      "sha256": "6a1463abf0183ca8224aad56894be024a469ef1d414c5f1e2cd4042f4cda42f1",
+      "bytes": 175218241
+    },
+    "remote-release.apk": {
+      "sha256": "b2ffcb2ca041e786d82de23e1d2dab67257c53f743717327f600ee9a8370061f",
+      "bytes": 175611477
+    },
+    "validation-release.apk": {
+      "sha256": "177f16955a8d2d0aea1ef376419cafb0306265b9b708b9e4368aa3b5d7fd3246",
+      "bytes": 175611477
+    }
+  },
+  "installed_apk": "production-release.apk",
+  "installed_base_apk_sha256": "6a1463abf0183ca8224aad56894be024a469ef1d414c5f1e2cd4042f4cda42f1",
+  "installed_hash_matches": true,
+  "production_entrypoint": "lib/main.dart",
+  "diagnostic_flags": false,
+  "voice_actions_default": false,
+  "offline_yolo_default": true,
+  "wifi_restored_enabled": true,
+  "fastapi_restored": "192.168.10.3:8000",
+  "ollama_loopback": "127.0.0.1:11434",
+  "backend_timeout_seconds_restored": 45,
+  "final_normal_app_checks": {
+    "start_yolo_with_fastapi_stopped": true,
+    "observed_offline_results_per_second": 3.9,
+    "manual_stop": true,
+    "camera_off_message_visible": true,
+    "normal_vlm_post_http_status": 200
+  },
+  "quality_limitations_present": true,
+  "measured_yolo_throughput_drop_percent": 8.7,
+  "evidence_sha256": {
+    "qwen3_vl_android_cancel_followup.json": "04f68f69befa81b5d33f4e57f59b98ce6696e84cc153221b2d73b56080238394",
+    "qwen3_vl_android_failure_tests.json": "78b4ba441c8c271e633f49f802f6acb53723a0fcc5934f588709ba4232d788fb",
+    "qwen3_vl_android_validation.json": "5610b4a113dba5e393815836ff30ad12fe41a7ecd55d6629504e4467ff9380b1",
+    "qwen3_vl_backend_benchmark.json": "ad949fa58fcb3f0561eeb99c3d6d65a30eb774d47f3872a81854e3953202b9ad",
+    "qwen3_vl_first_real_image.json": "fbe60fbf2601092c4dae6776a571a5a45300fdf0d97f8284b58da64500d0ea48",
+    "qwen3_vl_model_info.json": "34f0f6a1d8103814c1345edb390671f04e0ef3f2b90855d36f2535885152b121",
+    "qwen3_vl_quality_manifest.json": "1b8476116856f0f30f95c8d70f900dd08f91b227e8eee8265a6cde2a2feaec83",
+    "qwen3_vl_quality_review.json": "599904aaaa756ab5a37e07868b3096f9f8a5d9c158b69eb8d061dd6a7d121b7f",
+    "qwen3_vl_resource_probe.json": "f5cd7be6431cecab49cf4fc63b11ecb150cc469785efa31fc83e79cbc556c7fa"
+  }
+}

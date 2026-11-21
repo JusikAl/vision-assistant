@@ -7,7 +7,17 @@ import 'services/safety_service.dart';
 export 'services/safety_service.dart' show SafetyAlert, SafetyService;
 
 class _Speech {
-  _Speech(this.text, this.createdAt, {this.alert});
+  _Speech(
+    this.text,
+    this.createdAt, {
+    this.alert,
+    this.remember = true,
+    this.owner,
+    this.isCurrent,
+  });
+  final Object? owner;
+  final bool Function()? isCurrent;
+  final bool remember;
   final String text;
   final DateTime createdAt;
   final SafetyAlert? alert;
@@ -44,17 +54,21 @@ class SafetyTtsService {
   bool _enabled = true, _disposed = false, _audioBlocked = false;
   int _frames = 0;
   Future<void> Function(bool speaking)? onSpeakingChanged;
+  bool Function(int priority)? deferAlert;
   double? lastResponseMs, lastObstacleToSpeechMs;
   void Function(double responseMs, double? obstacleMs)? onSpeechStarted;
   DateTime? _speakRequestedAt;
   final Map<String, DateTime> _confirmedAt = {};
   final Map<String, DateTime> _failedUntil = {};
 
-  static const alertMaxAge = Duration(milliseconds: 1800);
+  static const alertMaxAge = Duration(milliseconds: 1500);
   static const messageMaxAge = Duration(seconds: 4);
+  String describeScene() => _safety.describeScene();
+
   bool get enabled => _enabled;
   bool get isSpeaking => _active != null;
   String get currentText => _active?.text ?? '';
+  String lastSpokenText = '';
   bool offlineVoiceReady = false;
   String? lastError;
   double lastSafetyMs = 0;
@@ -83,6 +97,9 @@ class SafetyTtsService {
       final active = _active;
       if (active == null || active.cancelled.isCompleted) return;
       final now = _clock();
+      final repeat = _lastSpoken.containsKey(active.alert?.cooldownKey);
+      // Only native-started speech is eligible for the repeat command.
+      if (active.remember) lastSpokenText = active.text;
       final requested = _speakRequestedAt;
       if (requested != null) {
         lastResponseMs = now.difference(requested).inMicroseconds / 1000;
@@ -90,12 +107,26 @@ class SafetyTtsService {
       lastObstacleToSpeechMs = null;
       final key = active.alert?.key;
       if (key != null) {
-        _lastSpoken[key] = now;
+        _lastSpoken[active.alert!.cooldownKey] = now;
         final confirmed = _confirmedAt[key];
         if (confirmed != null) {
           lastObstacleToSpeechMs =
               now.difference(confirmed).inMicroseconds / 1000;
         }
+      }
+      final alert = active.alert;
+      if (alert != null &&
+          alert.confirmedAt != null &&
+          alert.firstResultAt != null &&
+          alert.firstCameraAt != null) {
+        // Engine start callback, not an acoustic measurement or physical onset.
+        debugPrint(
+          'SAFETY LATENCY key=${alert.key} repeat=$repeat '
+          'result_to_confirmation_ms=${alert.confirmedAt!.difference(alert.firstResultAt!).inMicroseconds / 1000} '
+          'confirmation_to_tts_ms=${now.difference(alert.confirmedAt!).inMicroseconds / 1000} '
+          'camera_to_tts_ms=${now.difference(alert.firstCameraAt!).inMicroseconds / 1000} '
+          'evidence_age_at_tts_ms=${now.difference(alert.observedAt).inMicroseconds / 1000}',
+        );
       }
       if (lastResponseMs != null) {
         onSpeechStarted?.call(lastResponseMs!, lastObstacleToSpeechMs);
@@ -237,7 +268,8 @@ class SafetyTtsService {
     final now = _clock();
     SafetyAlert? best;
     for (final alert in _visible) {
-      final spoken = _lastSpoken[alert.key];
+      if (deferAlert?.call(alert.priority) == true) continue;
+      final spoken = _lastSpoken[alert.cooldownKey];
       if (!_fresh(alert, now) ||
           _active?.alert?.key == alert.key ||
           (_failedUntil[alert.key]?.isAfter(now) ?? false) ||
@@ -248,7 +280,9 @@ class SafetyTtsService {
       if (best == null ||
           alert.priority > best.priority ||
           (alert.priority == best.priority &&
-              alert.confidence > best.confidence)) {
+              (alert.riskScore > best.riskScore ||
+                  (alert.riskScore == best.riskScore &&
+                      alert.confidence > best.confidence)))) {
         best = alert;
       }
     }
@@ -313,7 +347,8 @@ class SafetyTtsService {
           job = _Speech(alert.text, _clock(), alert: alert);
         } else if (pendingMessage != null) {
           _message = null;
-          if (_clock().difference(pendingMessage.createdAt) >= messageMaxAge) {
+          if (_clock().difference(pendingMessage.createdAt) >= messageMaxAge ||
+              pendingMessage.isCurrent?.call() == false) {
             pendingMessage.finish();
             continue;
           }
@@ -333,7 +368,12 @@ class SafetyTtsService {
           // Our cancellation also covers engines whose speak future never
           // resolves after stop. Native stop still precedes the next speak.
           await onSpeakingChanged?.call(true);
-          if (_disposed || job.cancelled.isCompleted) {
+          if (_disposed ||
+              job.cancelled.isCompleted ||
+              job.isCurrent?.call() == false ||
+              (job.alert != null &&
+                  (!_fresh(job.alert!, _clock()) ||
+                      !_visible.any((a) => a.key == job!.alert!.key)))) {
             await _stopNative();
             continue;
           }
@@ -348,13 +388,13 @@ class SafetyTtsService {
             offlineVoiceReady = true;
             lastError = null;
             if (job.alert != null) {
-              _lastSpoken[job.alert!.key] = _clock();
+              _lastSpoken[job.alert!.cooldownKey] = _clock();
             }
           } else {
             offlineVoiceReady = false;
             lastError = 'TTS did not complete speech';
             if (job.alert != null) {
-              _lastSpoken.remove(job.alert!.key);
+              _lastSpoken.remove(job.alert!.cooldownKey);
               _failedUntil[job.alert!.key] = _clock().add(
                 const Duration(seconds: 2),
               );
@@ -366,7 +406,7 @@ class SafetyTtsService {
           offlineVoiceReady = false;
           debugPrint('TTS speech failed: $error');
           if (job.alert != null) {
-            _lastSpoken.remove(job.alert!.key);
+            _lastSpoken.remove(job.alert!.cooldownKey);
             _failedUntil[job.alert!.key] = _clock().add(
               const Duration(seconds: 2),
             );
@@ -393,17 +433,41 @@ class SafetyTtsService {
   }
 
   /// Latest reply replaces any queued reply. Important warnings may interrupt.
-  Future<void> speakMessage(String text) {
+  Future<void> speakMessage(
+    String text, {
+    bool remember = true,
+    Object? owner,
+    bool Function()? isCurrent,
+  }) {
     if (_disposed || _audioBlocked || text.trim().isEmpty) {
       return Future.value();
     }
     _message?.finish();
-    final job = _Speech(text, _clock());
+    final job = _Speech(
+      text,
+      _clock(),
+      remember: remember,
+      owner: owner,
+      isCurrent: isCurrent,
+    );
     _message = job;
     if (_active?.alert == null) _active?.cancel();
     _scheduleExpiry();
     _kick();
     return job.done.future;
+  }
+
+  /// Cancel one manual producer without stopping an automatic safety warning.
+  void cancelMessage(Object owner) {
+    if (identical(_message?.owner, owner)) {
+      _message?.finish();
+      _message = null;
+    }
+    if (_active?.alert == null && identical(_active?.owner, owner)) {
+      _active?.cancel();
+    }
+    _scheduleExpiry();
+    _kick();
   }
 
   void setEnabled(bool value) {

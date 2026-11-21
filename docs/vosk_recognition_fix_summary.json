@@ -1,0 +1,56 @@
+{
+  "suite": "TZ7.2",
+  "trials": 80,
+  "complete_series": true,
+  "command_counts": {
+    "Начать": {
+      "attempts": 10,
+      "successes": 10
+    },
+    "Закончить": {
+      "attempts": 10,
+      "successes": 10
+    },
+    "Что впереди?": {
+      "attempts": 10,
+      "successes": 10
+    },
+    "Опиши окружение": {
+      "attempts": 10,
+      "successes": 8
+    }
+  },
+  "command_successes": 38,
+  "full_describe_phrase_confirmations": 10,
+  "negative_attempts": 20,
+  "silence_attempts": 20,
+  "negative_false_intents": 1,
+  "silence_false_intents": 0,
+  "negative_false_actions": 1,
+  "silence_false_actions": 0,
+  "invalid_trials": [],
+  "aligned_after_speech": {
+    "n": 40,
+    "p50_ms": 1572.5781240000001,
+    "p95_ms": 1716.6829670000002
+  },
+  "modes": {
+    "False": {
+      "n": 20,
+      "p50_ms": 1572.5781240000001,
+      "p95_ms": 1666.6620819999998
+    },
+    "True": {
+      "n": 20,
+      "p50_ms": 1552.9522379999999,
+      "p95_ms": 1716.6829670000002
+    }
+  },
+  "accuracy_gate": true,
+  "negative_gate": false,
+  "silence_gate": true,
+  "latency_gate": false,
+  "critical_warning_device_gate": null,
+  "production_voice_actions_enabled_by_default": false,
+  "acceptance_passed": false
+}

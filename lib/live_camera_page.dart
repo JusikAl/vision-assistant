@@ -8,16 +8,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kReleaseMode;
 import 'package:flutter/services.dart';
-import 'package:image/image.dart' as img;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import 'app_config.dart';
 import 'safety_tts_service.dart';
-import 'voice_command_service.dart';
-import 'wake_word_service.dart';
 import 'services/detection_mode_manager.dart';
 import 'services/local_yolo_service.dart';
 import 'services/voice_command_parser.dart';
+import 'services/voice_command_handler.dart';
+import 'services/vosk_service.dart';
+import 'services/voice_command_router.dart';
+import 'services/vlm_service.dart';
+import 'services/nv21_jpeg_encoder.dart';
 import 'services/performance_report.dart';
 
 // ==========================================
@@ -42,55 +44,16 @@ void _encoderIsolateEntry(SendPort mainPort) {
       final stride = job[3] as int;
       final rotation = job[4] as int;
 
-      const maxDimension = 960;
+      final maxDimension = job[5] as int;
 
-      final longestSide = width > height ? width : height;
-
-      final scale = longestSide > maxDimension
-          ? maxDimension / longestSide
-          : 1.0;
-
-      final targetWidth = (width * scale).round();
-      final targetHeight = (height * scale).round();
-
-      final image = img.Image(width: targetWidth, height: targetHeight);
-
-      final uvStart = stride * height;
-
-      for (int y = 0; y < targetHeight; y++) {
-        final sourceY = y * height ~/ targetHeight;
-        final yRow = sourceY * stride;
-        final uvRow = uvStart + (sourceY ~/ 2) * stride;
-
-        for (int x = 0; x < targetWidth; x++) {
-          final sourceX = x * width ~/ targetWidth;
-
-          final yIndex = yRow + sourceX;
-          final uvIndex = uvRow + (sourceX ~/ 2) * 2;
-
-          if (yIndex >= data.length || uvIndex + 1 >= data.length) {
-            throw const FormatException('Invalid NV21 buffer');
-          }
-
-          final luma = data[yIndex];
-          final v = data[uvIndex] - 128;
-          final u = data[uvIndex + 1] - 128;
-
-          final r = (luma + 1.402 * v).clamp(0, 255).toInt();
-
-          final g = (luma - 0.344136 * u - 0.714136 * v).clamp(0, 255).toInt();
-
-          final b = (luma + 1.772 * u).clamp(0, 255).toInt();
-
-          image.setPixelRgb(x, y, r, g, b);
-        }
-      }
-
-      final oriented = rotation == 0
-          ? image
-          : img.copyRotate(image, angle: rotation);
-
-      final jpeg = Uint8List.fromList(img.encodeJpg(oriented, quality: 78));
+      final jpeg = encodeNv21Jpeg(
+        data,
+        width,
+        height,
+        stride,
+        rotation,
+        maxDimension: maxDimension,
+      );
 
       mainPort.send([true, jpeg]);
     } catch (error) {
@@ -160,7 +123,11 @@ class _FrameEncoder {
     _sendPort = await ready.future;
   }
 
-  Future<Uint8List> encode(CameraImage frame, int rotation) {
+  Future<Uint8List> encode(
+    CameraImage frame,
+    int rotation, {
+    int maxDimension = 960,
+  }) {
     if (_disposed || _sendPort == null || _pending != null) {
       return Future.error(StateError('Encoder is unavailable'));
     }
@@ -184,6 +151,7 @@ class _FrameEncoder {
         frame.height,
         plane.bytesPerRow,
         rotation,
+        maxDimension,
       ]);
     } catch (error, stackTrace) {
       _pending = null;
@@ -225,19 +193,22 @@ class LiveCameraPage extends StatefulWidget {
 class _LiveCameraPageState extends State<LiveCameraPage>
     with WidgetsBindingObserver {
   CameraController? controller;
+  Future<void>? _cameraInitialization;
 
   WebSocketChannel? socket;
   StreamSubscription<dynamic>? subscription;
 
   Timer? responseTimeout;
-  Timer? _wakeRestartTimer;
 
   final _encoder = _FrameEncoder();
   final DetectionModeManager _modeManager = DetectionModeManager();
   final LocalYoloService _localYolo = LocalYoloService();
   Timer? _reconnectTimer;
   bool _reconnecting = false;
-  bool _offlineOnly = const bool.fromEnvironment('OFFLINE_ONLY');
+  bool _offlineOnly = const bool.fromEnvironment(
+    'OFFLINE_ONLY',
+    defaultValue: true,
+  );
   String _offlineModelStatus = 'loading';
   int _session = 0;
   Stopwatch? _detectStartup;
@@ -249,25 +220,50 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   final _performance = PerformanceReport();
   bool _speechOwnsAudio = false;
-  int _voiceFailures = 0;
 
   final SafetyTtsService _safetyTts = SafetyTtsService();
+  late final VlmService _vlm = VlmService(
+    backend: HttpVlmBackend.configured(() => AppConfig.vlmBaseUrl),
+    capture: _captureVlmFrame,
+    speak: (text, owner, isCurrent) =>
+        _safetyTts.speakMessage(text, owner: owner, isCurrent: isCurrent),
+    cancelSpeech: _safetyTts.cancelMessage,
+  );
+  Completer<VlmFrame>? _vlmFrameRequest;
+  int _vlmCaptureEpoch = 0;
+  String _vlmCameraMessage = '';
 
-  final VoiceCommandService _voiceCommands = VoiceCommandService();
-
-  final WakeWordService _wakeWord = WakeWordService();
-
-  bool _wakeModeEnabled = true;
-  bool _wakeStarting = false;
-
-  bool _commandStarted = false;
+  // Live acceptance failed (negative/silence false activations). Production
+  // retains manual actions; explicit opt-in is for further controlled testing.
+  static const _voiceActionsAccepted = bool.fromEnvironment(
+    'VOSK_ACTIONS_ENABLED',
+    defaultValue: false,
+  );
+  final VoskService _vosk = VoskService();
+  final VoiceCommandRouter _voiceRouter = VoiceCommandRouter();
+  late final VoiceCommandHandler _commandHandler = VoiceCommandHandler(
+    start: () async {
+      if (!running) await startDetection();
+      return running;
+    },
+    stop: () async {
+      if (running) await stopDetection();
+    },
+    scene: LocalSceneDescription(_describeDetectedObjects),
+    previousMessage: () => _safetyTts.lastSpokenText,
+    setWarnings: (enabled) {
+      _safetyTts.setEnabled(enabled);
+      if (mounted) setState(() => voiceEnabled = enabled);
+    },
+  );
 
   bool voiceListening = false;
   bool processingVoiceCommand = false;
 
-  String recognizedVoiceText = 'Ожидание «Hey Jarvis»';
+  String recognizedVoiceText = 'Нажмите микрофон и скажите команду';
 
   String lastVoiceReply = '';
+  Map<String, dynamic>? lastVoiceAction;
 
   // ======================================
   // DETECTION STATE
@@ -279,6 +275,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   bool starting = false;
 
   bool voiceEnabled = true;
+  double cameraToResultMs = 0;
   bool depthEnabled = false;
 
   String status = 'Initializing camera';
@@ -320,6 +317,37 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
     WidgetsBinding.instance.addObserver(this);
     _performance.start();
+    _vlm.onChanged = () {
+      if (mounted) setState(() {});
+    };
+    _vosk.onStateChanged = (state) {
+      if (!mounted) return;
+      setState(() => voiceListening = state == VoskState.listening);
+    };
+    _vosk.onPartial = (text) {
+      if (mounted) setState(() => recognizedVoiceText = 'Слышу: $text');
+    };
+    _vosk.onMeasured = (metrics) {
+      _performance.record(
+        'vosk_recording_ms',
+        (metrics['audio_ms'] as num?)?.toDouble(),
+      );
+      _performance.record(
+        'vosk_after_speech_ms',
+        (metrics['after_speech_ms'] as num?)?.toDouble(),
+      );
+      _performance.record(
+        'vosk_compute_ms',
+        (metrics['native_compute_ms'] as num?)?.toDouble(),
+      );
+    };
+    if (_voiceActionsAccepted) {
+      unawaited(
+        _vosk.initialize().catchError((Object error) {
+          if (mounted) setState(() => recognizedVoiceText = 'Vosk: $error');
+        }),
+      );
+    }
     AndroidCameraCameraX.analysisWidth = const int.fromEnvironment(
       'YOLO_ANALYSIS_WIDTH',
     );
@@ -338,20 +366,19 @@ class _LiveCameraPageState extends State<LiveCameraPage>
       _performance.record('tts_response_ms', response);
       _performance.record('confirmed_to_speech_ms', obstacle);
     };
-    _voiceCommands.onRecognitionMeasured = (milliseconds) =>
-        _performance.record('voice_recognition_ms', milliseconds);
     _safetyTts.onSpeakingChanged = (speaking) async {
       _speechOwnsAudio = speaking;
-      if (speaking) {
-        _wakeRestartTimer?.cancel();
-        await _voiceCommands.setSpeaking(true);
-        await _wakeWord.stop();
-        if (mounted) setState(() => voiceListening = false);
-      } else {
-        await _voiceCommands.setSpeaking(false);
-        _scheduleWakeListening(const Duration(milliseconds: 350));
-      }
+      if (speaking) _voiceRouter.cancel();
+      await _vosk.setSpeaking(speaking);
+      if (mounted) setState(() => voiceListening = false);
     };
+    // Informational narration can wait for a short voice operation. Warnings
+    // and critical alerts always remain eligible and cancel microphone work.
+    _safetyTts.deferAlert = (priority) =>
+        priority == 1 &&
+        (_vosk.isListening ||
+            _vosk.isProcessing ||
+            _vosk.state == VoskState.processing);
 
     initializeCamera();
     // Paint the first UI before asset loading; all native initialization and
@@ -398,22 +425,16 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) cancelEnvironmentDescription();
     if (state == AppLifecycleState.resumed) {
-      _wakeModeEnabled = true;
       _safetyTts.setEnabled(voiceEnabled);
-
-      if (controller?.value.isInitialized == true) {
-        _scheduleWakeListening(const Duration(milliseconds: 800));
-      }
     } else if (state == AppLifecycleState.paused ||
         state == AppLifecycleState.detached) {
-      _wakeModeEnabled = false;
       _safetyTts.setEnabled(false);
-      _wakeRestartTimer?.cancel();
 
       unawaited(_safetyTts.stop());
-      unawaited(_voiceCommands.cancel());
-      unawaited(_wakeWord.stop());
+      _voiceRouter.cancel();
+      unawaited(_vosk.cancel());
 
       voiceListening = false;
     }
@@ -423,7 +444,10 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   // CAMERA INITIALIZATION
   // ======================================
 
-  Future<void> initializeCamera() async {
+  Future<void> initializeCamera() => _cameraInitialization ??=
+      _initializeCamera().whenComplete(() => _cameraInitialization = null);
+
+  Future<void> _initializeCamera() async {
     try {
       final cameras = await availableCameras();
 
@@ -456,8 +480,6 @@ class _LiveCameraPageState extends State<LiveCameraPage>
         controller = camera;
         status = 'Camera ready';
       });
-
-      _scheduleWakeListening(const Duration(milliseconds: 1200));
     } catch (error) {
       if (mounted) {
         setState(() {
@@ -472,6 +494,9 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   // ======================================
 
   Future<void> startDetection() async {
+    if (running || stopping || starting || !mounted) return;
+    if (controller?.value.isInitialized != true) await initializeCamera();
+    if (!mounted) return;
     final camera = controller;
     if (running ||
         stopping ||
@@ -482,6 +507,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     }
 
     starting = true;
+    _vlmCameraMessage = '';
     _safetyTts.resetScene();
     final session = ++_session;
     _detectStartup = Stopwatch()..start();
@@ -711,6 +737,9 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   }
 
   void processFrame(CameraImage frame) {
+    _offerVlmFrame(
+      frame,
+    ); // One requested frame; never await VLM from the detection pipeline.
     if (defaultTargetPlatform != TargetPlatform.android) {
       _performance.cameraFrame();
     }
@@ -749,6 +778,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   Future<void> _processOfflineFrame(CameraImage frame, int rotation) async {
     final session = _session;
+    final receivedAt = DateTime.now();
     try {
       // Connected Mode continues using the original JPEG/WebSocket encoder.
       // Offline Mode reads NV21 directly and avoids the JPEG round-trip.
@@ -760,13 +790,16 @@ class _LiveCameraPageState extends State<LiveCameraPage>
           stopping) {
         return;
       }
+      cameraToResultMs =
+          DateTime.now().difference(receivedAt).inMicroseconds / 1000;
       _logFirstDetectionResult('offline');
       final alerts = _safetyTts.onDetections(
         detections: result.detections,
         imageWidth: result.imageWidth,
         imageHeight: result.imageHeight,
-        frameAgeMs: result.processingMs,
+        frameAgeMs: DateTime.now().difference(receivedAt).inMicroseconds / 1000,
       );
+      _performance.record('camera_to_result_ms', cameraToResultMs);
       _performance.record('inference_ms', result.yoloMs);
       _performance.record('preprocess_ms', result.preprocessMs);
       _performance.record('transfer_copy_ms', result.transferMs);
@@ -918,262 +951,20 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   }
 
   // ======================================
-  // WAKE WORD LISTENING
-  // ======================================
-
-  void _scheduleWakeListening([
-    Duration delay = const Duration(milliseconds: 1200),
-  ]) {
-    if (!mounted ||
-        !_wakeModeEnabled ||
-        _speechOwnsAudio ||
-        processingVoiceCommand) {
-      return;
-    }
-
-    _wakeRestartTimer?.cancel();
-
-    _wakeRestartTimer = Timer(delay, () {
-      if (mounted) {
-        unawaited(_startWakeListening());
-      }
-    });
-  }
-
-  Future<void> _startWakeListening() async {
-    if (!mounted ||
-        !_wakeModeEnabled ||
-        _speechOwnsAudio ||
-        _wakeStarting ||
-        voiceListening ||
-        processingVoiceCommand) {
-      return;
-    }
-
-    _wakeStarting = true;
-
-    try {
-      await _wakeWord.start(
-        onDetected: _onWakeDetected,
-        onError: (error) {
-          debugPrint('WAKE ERROR: $error');
-
-          if (!mounted || !_wakeModeEnabled) {
-            return;
-          }
-
-          _wakeModeEnabled = false;
-
-          setState(() {
-            voiceListening = false;
-            recognizedVoiceText = 'Wake word ошибка: $error';
-          });
-        },
-      );
-
-      if (!mounted || !_wakeModeEnabled) {
-        await _wakeWord.stop();
-        return;
-      }
-
-      setState(() {
-        voiceListening = true;
-        recognizedVoiceText = 'Ожидание «Hey Jarvis»';
-      });
-    } catch (error) {
-      debugPrint('WAKE START ERROR: $error');
-
-      if (mounted) {
-        _wakeModeEnabled = false;
-
-        setState(() {
-          voiceListening = false;
-          recognizedVoiceText = 'Wake word не запущен: $error';
-        });
-      }
-    } finally {
-      _wakeStarting = false;
-    }
-  }
-
-  // ======================================
-  // WAKE WORD DETECTED
-  // ======================================
-
-  Future<void> _onWakeDetected() async {
-    if (!mounted ||
-        !_wakeModeEnabled ||
-        _speechOwnsAudio ||
-        processingVoiceCommand) {
-      return;
-    }
-
-    processingVoiceCommand = true;
-    _commandStarted = false;
-
-    _wakeRestartTimer?.cancel();
-
-    setState(() {
-      voiceListening = false;
-      recognizedVoiceText = 'Hey Jarvis обнаружено. Скажите команду';
-    });
-
-    try {
-      await _voiceCommands.listen(
-        onResult: (text) {
-          if (!mounted || !_wakeModeEnabled) return;
-
-          _commandStarted = true;
-          _voiceFailures = 0;
-
-          setState(() {
-            recognizedVoiceText = 'Команда: $text';
-          });
-
-          unawaited(_runCommandAndResume(text));
-        },
-        onPartial: (text) {
-          if (!mounted || !_wakeModeEnabled) return;
-
-          setState(() {
-            recognizedVoiceText = 'Слышу: $text';
-          });
-        },
-        onError: (message) {
-          debugPrint('COMMAND STT ERROR: $message');
-          if (++_voiceFailures >= 3) _wakeModeEnabled = false;
-
-          if (!mounted || !_wakeModeEnabled) return;
-
-          setState(() {
-            recognizedVoiceText = 'Распознавание: $message';
-          });
-        },
-        onDone: () {
-          if (!_commandStarted) {
-            unawaited(_resumeWakeAfterCommand());
-          }
-        },
-      );
-    } catch (error) {
-      debugPrint('COMMAND ERROR: $error');
-
-      await _resumeWakeAfterCommand();
-    }
-  }
-
-  // ======================================
-  // EXECUTE COMMAND AND RESUME
-  // ======================================
-
-  Future<void> _runCommandAndResume(String text) async {
-    _commandStarted = true;
-
-    try {
-      await _executeVoiceCommand(text);
-    } finally {
-      await _resumeWakeAfterCommand();
-    }
-  }
-
-  Future<void> _resumeWakeAfterCommand() async {
-    if (!mounted || !processingVoiceCommand) {
-      return;
-    }
-
-    _commandStarted = false;
-
-    setState(() {
-      processingVoiceCommand = false;
-    });
-
-    if (_wakeModeEnabled) {
-      _scheduleWakeListening(
-        Duration(milliseconds: 900 * (1 << _voiceFailures.clamp(0, 3))),
-      );
-    }
-  }
-
-  // ======================================
   // VOICE COMMAND PROCESSING
   // ======================================
 
-  Future<void> _executeVoiceCommand(String transcript) async {
+  Future<void> _executeVoiceCommand(VoiceCommand command) async {
     try {
-      final command = VoiceCommandParser.normalize(transcript);
-      final intent = VoiceCommandParser.parse(command);
-
-      String reply;
-
-      if (_hasAny(command, ['выключи', 'отключи', 'убери']) &&
-          _hasAny(command, ['предупрежден', 'озвуч', 'голос', 'звук'])) {
-        _safetyTts.setEnabled(false);
-
-        if (mounted) {
-          setState(() => voiceEnabled = false);
-        }
-
-        reply = 'Автоматические предупреждения выключены';
-      } else if (_hasAny(command, ['включи', 'верни']) &&
-          _hasAny(command, ['предупрежден', 'озвуч', 'голос', 'звук'])) {
-        _safetyTts.setEnabled(true);
-
-        if (mounted) {
-          setState(() => voiceEnabled = true);
-        }
-
-        reply = 'Автоматические предупреждения включены';
-      } else if (intent == VoiceCommand.describe) {
-        reply = _describeDetectedObjects();
-      } else if (_hasAny(command, [
-        'повтори',
-        'повторить',
-        'еще раз',
-        'скажи снова',
-      ])) {
-        reply = lastVoiceReply.isNotEmpty
-            ? lastVoiceReply
-            : lastSafetyWarning.isNotEmpty
-            ? lastSafetyWarning
-            : 'Пока нечего повторять';
-      } else if (_hasAny(command, ['помощь', 'команды', 'подсказка'])) {
-        reply =
-            'После Hey Jarvis скажите: '
-            'начать, остановить, что впереди, '
-            'повтори, включи предупреждения '
-            'или выключи предупреждения';
-      } else if (intent == VoiceCommand.stop) {
-        if (running) {
-          await stopDetection();
-        }
-
-        reply = 'Обнаружение остановлено';
-      } else if (intent == VoiceCommand.start) {
-        if (!running) {
-          await startDetection();
-        }
-
-        reply = running
-            ? 'Обнаружение запущено'
-            : 'Не удалось запустить обнаружение';
-      } else {
-        reply =
-            'Команда не распознана. '
-            'Скажите: помощь';
-      }
-
+      final reply = await _commandHandler.handleCommand(command);
       if (!mounted) return;
-
-      if (!_hasAny(command, [
-        'повтори',
-        'повторить',
-        'еще раз',
-        'скажи снова',
-      ])) {
+      if (command != VoiceCommand.repeat) {
         lastVoiceReply = reply;
       }
-
-      await _safetyTts.speakMessage(reply);
+      await _safetyTts.speakMessage(
+        reply,
+        remember: command != VoiceCommand.repeat,
+      );
     } catch (error) {
       debugPrint('Voice command failed: $error');
 
@@ -1183,92 +974,22 @@ class _LiveCameraPageState extends State<LiveCameraPage>
     }
   }
 
-  bool _hasAny(String text, List<String> phrases) {
-    return phrases.any(text.contains);
-  }
-
   // ======================================
   // OBJECT DESCRIPTION
   // ======================================
 
   String _describeDetectedObjects() {
     if (!running) {
-      return 'Обнаружение выключено. '
-          'Скажите Hey Jarvis, затем начать';
+      return 'Нет свежих данных с камеры';
     }
 
-    if (detections.isEmpty || imageWidth <= 0) {
-      return 'Камера сейчас не обнаружила объектов';
+    final resultAt = lastResult;
+    final age = resultAt == null ? null : DateTime.now().difference(resultAt);
+    if (age == null || age.isNegative || age > SafetyService.maxFrameGap) {
+      return 'Нет свежих данных с камеры';
     }
 
-    const names = <String, String>{
-      'bike': 'велосипед',
-      'building': 'здание',
-      'car': 'автомобиль',
-      'person': 'человек',
-      'stairs': 'лестница',
-      'traffic sign': 'дорожный знак',
-      'electrical pole': 'столб',
-      'road': 'дорога',
-      'motorcycle': 'мотоцикл',
-      'dustbin': 'мусорный бак',
-      'dog': 'собака',
-      'manhole': 'люк',
-      'tree': 'дерево',
-      'guard rail': 'ограждение',
-      'pedestrian crosswalk': 'пешеходный переход',
-      'truck': 'грузовик',
-      'bus': 'автобус',
-      'bench': 'скамейка',
-      'traffic cone': 'дорожный конус',
-      'fire hydrant': 'гидрант',
-      'teraffic barrel': 'дорожный барьер',
-      'plant pot': 'горшок с растением',
-      'electrical box': 'электрический шкаф',
-      'chair': 'стул',
-      'bicycle rack': 'велосипедная стойка',
-    };
-
-    final visible = <String>{};
-
-    for (final detection in detections) {
-      if (detection is! Map) continue;
-
-      final confidence = (detection['confidence'] as num?)?.toDouble() ?? 0;
-
-      if (confidence < 0.40) continue;
-
-      final bbox = detection['bbox'];
-
-      if (bbox is! List ||
-          bbox.length != 4 ||
-          bbox.any((value) => value is! num)) {
-        continue;
-      }
-
-      final cx =
-          ((bbox[0] as num).toDouble() + (bbox[2] as num).toDouble()) /
-          (2 * imageWidth);
-
-      if (cx < 0.20 || cx > 0.80) continue;
-
-      final name = detection['class_name']?.toString().toLowerCase() ?? '';
-
-      final russian = names[name];
-
-      if (russian != null) {
-        visible.add(russian);
-      }
-
-      if (visible.length >= 4) break;
-    }
-
-    if (visible.isEmpty) {
-      return 'В центральной части кадра '
-          'объекты не обнаружены';
-    }
-
-    return 'Камера видит: ${visible.join(', ')}';
+    return _safetyTts.describeScene();
   }
 
   // ======================================
@@ -1276,6 +997,7 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   // ======================================
 
   Future<void> stopDetection({String? errorMessage}) async {
+    cancelEnvironmentDescription();
     if (stopping) return;
 
     stopping = true;
@@ -1363,27 +1085,201 @@ class _LiveCameraPageState extends State<LiveCameraPage>
   }
 
   // ======================================
-  // MANUAL WAKE WORD RESTART
+  // PUSH-TO-TALK VOICE INPUT
   // ======================================
 
-  Future<void> _restartWakeWord() async {
-    if (processingVoiceCommand) return;
-    _voiceFailures = 0;
+  Future<VlmFrame> _captureVlmFrame() async {
+    final token = ++_vlmCaptureEpoch;
+    await _encoder.start();
+    if (!mounted ||
+        !running ||
+        token != _vlmCaptureEpoch ||
+        controller?.value.isStreamingImages != true) {
+      throw StateError('Camera is not streaming');
+    }
+    final request = Completer<VlmFrame>();
+    _vlmFrameRequest = request;
+    try {
+      return await request.future.timeout(const Duration(seconds: 2));
+    } finally {
+      if (identical(_vlmFrameRequest, request)) _vlmFrameRequest = null;
+    }
+  }
 
-    _wakeRestartTimer?.cancel();
-    _wakeModeEnabled = false;
+  void _offerVlmFrame(CameraImage frame) {
+    final request = _vlmFrameRequest;
+    if (request == null || request.isCompleted || !running || _encoder.isBusy) {
+      return;
+    }
+    _vlmFrameRequest = null;
+    final capturedAt = DateTime.now().toUtc();
+    final sensor = controller?.description.sensorOrientation ?? 90;
+    final rotation = frame.width > frame.height
+        ? (sensor % 360 + 360) % 360
+        : 0;
+    final watch = Stopwatch()..start();
+    unawaited(
+      _encoder
+          .encode(frame, rotation, maxDimension: 640)
+          .then(
+            (jpeg) {
+              if (!request.isCompleted) {
+                request.complete(
+                  VlmFrame(
+                    jpeg,
+                    capturedAt,
+                    preprocessingMs: watch.elapsedMicroseconds / 1000,
+                  ),
+                );
+              }
+            },
+            onError: (Object error, StackTrace stack) {
+              if (!request.isCompleted) request.completeError(error, stack);
+            },
+          ),
+    );
+  }
 
-    await _wakeWord.stop();
+  Future<String?> describeEnvironment() async {
+    if (!mounted) return null;
+    if (!running || controller?.value.isStreamingImages != true) {
+      setState(
+        () => _vlmCameraMessage =
+            'Сначала запустите камеру кнопкой Start Detection',
+      );
+      return null;
+    }
+    if (_vlm.isBusy) return null;
+    setState(() => _vlmCameraMessage = '');
+    return _vlm.describe();
+  }
 
-    if (!mounted) return;
+  void cancelEnvironmentDescription() {
+    ++_vlmCaptureEpoch;
+    _vlm.cancel();
+    final pending = _vlmFrameRequest;
+    _vlmFrameRequest = null;
+    if (pending != null && !pending.isCompleted) {
+      pending.completeError(StateError('VLM cancelled'));
+    }
+  }
 
-    setState(() {
-      voiceListening = false;
-      _wakeModeEnabled = true;
-      recognizedVoiceText = 'Перезапуск wake word...';
-    });
+  VlmService get diagnosticVlm {
+    if (kReleaseMode &&
+        !const bool.fromEnvironment('VLM_DIAGNOSTICS_ENABLED')) {
+      throw StateError('Explicit VLM diagnostics build required');
+    }
+    return _vlm;
+  }
 
-    _scheduleWakeListening(const Duration(milliseconds: 400));
+  SafetyTtsService get diagnosticSpeech {
+    if (kReleaseMode &&
+        !const bool.fromEnvironment('VLM_DIAGNOSTICS_ENABLED')) {
+      throw StateError('Explicit VLM diagnostics build required');
+    }
+    return _safetyTts;
+  }
+
+  Future<void> suspendCameraForDiagnostic() async {
+    if (kReleaseMode &&
+        !const bool.fromEnvironment('VOSK_DIAGNOSTICS_ENABLED')) {
+      throw StateError('Explicit diagnostics build required');
+    }
+    await stopDetection();
+    await _cameraInitialization;
+    final camera = controller;
+    controller = null;
+    await camera?.dispose();
+    if (mounted) setState(() {});
+  }
+
+  VoskService get diagnosticVosk {
+    if (kReleaseMode &&
+        !const bool.fromEnvironment('VOSK_DIAGNOSTICS_ENABLED')) {
+      throw StateError('Explicit diagnostics build required');
+    }
+    return _vosk;
+  }
+
+  Future<void> activateVoiceCommand() async {
+    if (!mounted || _speechOwnsAudio) return;
+    if (_vosk.isListening) {
+      await _vosk.stopListening();
+      return;
+    }
+    if (processingVoiceCommand) {
+      _voiceRouter.cancel();
+      await _vosk.cancel();
+      return;
+    }
+    setState(() => processingVoiceCommand = true);
+    int? id;
+    try {
+      final pending = _vosk.startListening();
+      id = _vosk.session;
+      _voiceRouter.begin(id);
+      final text = await pending;
+      if (!mounted ||
+          _speechOwnsAudio ||
+          text == null ||
+          !_vosk.isCurrent(id)) {
+        return;
+      }
+      setState(() => recognizedVoiceText = text);
+      final command = _voiceRouter.route(
+        text,
+        session: id,
+        isFinal: true,
+        alternatives: _vosk.alternatives,
+      );
+      debugPrint(
+        'VOSK ROUTE session=$id text=$text command=${command.name} camera_active=$running',
+      );
+      final execute =
+          _voiceActionsAccepted &&
+          command != VoiceCommand.unknown &&
+          command != VoiceCommand.describeEnvironment;
+      if (execute) {
+        if (!_vosk.beginExecution(id)) return;
+        await _executeVoiceCommand(command);
+      }
+      lastVoiceAction = {
+        'session': id,
+        'command': command.name,
+        'raw_text': text,
+        'running_after': running,
+        'reply': lastVoiceReply,
+        'actions_enabled': _voiceActionsAccepted,
+        'executed': execute,
+        'intent_only': command == VoiceCommand.describeEnvironment,
+      };
+      unawaited(
+        NativeVoskBackend.channel
+            .invokeMethod<void>('logAction', {
+              'type': 'action',
+              'session': id,
+              'command': command.name,
+              'raw_text': text,
+              'running_after': running,
+              'reply': lastVoiceReply,
+              'actions_enabled': _voiceActionsAccepted,
+              'executed': execute,
+              'intent_only': command == VoiceCommand.describeEnvironment,
+              'wall_time_ms': DateTime.now().millisecondsSinceEpoch,
+            })
+            .catchError((Object error) {
+              debugPrint('Vosk action logging: $error');
+            }),
+      );
+      debugPrint(
+        'VOSK ACTION session=$id command=${command.name} running=$running',
+      );
+    } catch (error) {
+      if (mounted) setState(() => recognizedVoiceText = error.toString());
+    } finally {
+      if (id != null) _vosk.endExecution(id);
+      if (mounted) setState(() => processingVoiceCommand = false);
+    }
   }
 
   // ======================================
@@ -1404,143 +1300,223 @@ class _LiveCameraPageState extends State<LiveCameraPage>
           children: [
             Expanded(child: buildCameraPreview()),
 
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                children: [
-                  Text('Status: $status', textAlign: TextAlign.center),
-                  Text('Offline YOLO: $_offlineModelStatus'),
-                  if (voiceEnabled && !_safetyTts.offlineVoiceReady)
-                    Text(
-                      _safetyTts.lastError == null
-                          ? 'Подготовка голоса…'
-                          : 'Голосовые предупреждения недоступны. Проверьте '
-                                'русский офлайн-голос в настройках синтеза речи Android.',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.orange),
-                    ),
+            Flexible(
+              flex: 2,
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Text('Status: $status', textAlign: TextAlign.center),
+                      Text('Offline YOLO: $_offlineModelStatus'),
+                      if (voiceEnabled && !_safetyTts.offlineVoiceReady)
+                        Text(
+                          _safetyTts.lastError == null
+                              ? 'Подготовка голоса…'
+                              : 'Голосовые предупреждения недоступны. Проверьте '
+                                    'русский офлайн-голос в настройках синтеза речи Android.',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.orange),
+                        ),
 
-                  Text(
-                    _modeManager.isOffline
-                        ? 'MODE: OFFLINE · Visual warnings · Distance unavailable'
-                        : _modeManager.isConnected
-                        ? 'MODE: CONNECTED'
-                        : 'MODE: NO DETECTION',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: _modeManager.isOffline ? Colors.orange : null,
-                    ),
-                  ),
-
-                  Text(
-                    'WebSocket: $serverDebugAddress',
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 11),
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  Text(
-                    'Objects: ${detections.length} | '
-                    'FPS: ${fps.toStringAsFixed(1)}',
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    _modeManager.isOffline
-                        ? 'Offline total: ${processingMs.toStringAsFixed(0)} ms | '
-                              'Prep: ${offlinePreprocessMs.toStringAsFixed(0)} ms | '
-                              'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
-                              'Post: ${offlinePostprocessMs.toStringAsFixed(0)} ms'
-                        : 'Server: ${processingMs.toStringAsFixed(0)} ms | '
-                              'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
-                              'Depth: ${depthEnabled ? '${depthMs.toStringAsFixed(0)} ms' : 'off'}',
-                    textAlign: TextAlign.center,
-                  ),
-
-                  if (imageWidth > 0 && imageHeight > 0) ...[
-                    const SizedBox(height: 4),
-
-                    Text(
-                      'Frame: '
-                      '$imageWidth x $imageHeight',
-                    ),
-                  ],
-
-                  const SizedBox(height: 8),
-
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Только Offline YOLO (для проверки)'),
-                    subtitle: const Text('Сервер не используется'),
-                    value: _offlineOnly,
-                    onChanged: running || starting || stopping
-                        ? null
-                        : (value) => setState(() => _offlineOnly = value),
-                  ),
-
-                  SwitchListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('Голосовые предупреждения'),
-                    subtitle: const Text('YOLO Safety Assistant'),
-                    secondary: const Icon(Icons.record_voice_over),
-                    value: voiceEnabled,
-                    onChanged: (value) {
-                      _safetyTts.setEnabled(value);
-
-                      setState(() {
-                        voiceEnabled = value;
-                      });
-                    },
-                  ),
-
-                  if (lastSafetyWarning.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 6),
-                      child: Text(
-                        lastSafetyWarning,
+                      Text(
+                        _modeManager.isOffline
+                            ? 'MODE: OFFLINE · Visual warnings · Distance unavailable'
+                            : _modeManager.isConnected
+                            ? 'MODE: CONNECTED'
+                            : 'MODE: NO DETECTION',
                         textAlign: TextAlign.center,
-                        maxLines: 2,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: _modeManager.isOffline ? Colors.orange : null,
                         ),
                       ),
-                    ),
 
-                  const SizedBox(height: 8),
+                      Text(
+                        'WebSocket: $serverDebugAddress',
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontSize: 11),
+                      ),
 
-                  const Text(
-                    'Голосовое управление: '
-                    '«Hey Jarvis», затем команда',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.w500),
-                  ),
+                      const SizedBox(height: 8),
 
-                  const SizedBox(height: 8),
+                      Text(
+                        'Objects: ${detections.length} | '
+                        'FPS: ${fps.toStringAsFixed(1)}',
+                      ),
 
-                  if (recognizedVoiceText.isNotEmpty)
-                    Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 4),
-                      child: Text(
-                        recognizedVoiceText,
-                        maxLines: 3,
+                      const SizedBox(height: 4),
+
+                      Text(
+                        _modeManager.isOffline
+                            ? 'Offline total: ${processingMs.toStringAsFixed(0)} ms | '
+                                  'Prep: ${offlinePreprocessMs.toStringAsFixed(0)} ms | '
+                                  'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
+                                  'Post: ${offlinePostprocessMs.toStringAsFixed(0)} ms'
+                            : 'Server: ${processingMs.toStringAsFixed(0)} ms | '
+                                  'YOLO: ${yoloMs.toStringAsFixed(0)} ms | '
+                                  'Depth: ${depthEnabled ? '${depthMs.toStringAsFixed(0)} ms' : 'off'}',
                         textAlign: TextAlign.center,
                       ),
-                    ),
 
-                  const SizedBox(height: 8),
+                      if (imageWidth > 0 && imageHeight > 0) ...[
+                        const SizedBox(height: 4),
 
-                  OutlinedButton.icon(
-                    onPressed: processingVoiceCommand ? null : _restartWakeWord,
-                    icon: const Icon(Icons.mic),
-                    label: const Text('Перезапустить wake word'),
+                        Text(
+                          'Frame: '
+                          '$imageWidth x $imageHeight',
+                        ),
+                      ],
+
+                      const SizedBox(height: 8),
+
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Только Offline YOLO (для проверки)'),
+                        subtitle: Text(
+                          _offlineOnly
+                              ? 'Обнаружение работает без сервера. Подробное описание требует Wi-Fi.'
+                              : 'Подробное описание снимка доступно по Wi-Fi.',
+                        ),
+                        value: _offlineOnly,
+                        onChanged: running || starting || stopping
+                            ? null
+                            : (value) => setState(() => _offlineOnly = value),
+                      ),
+
+                      SwitchListTile(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Голосовые предупреждения'),
+                        subtitle: const Text('YOLO Safety Assistant'),
+                        secondary: const Icon(Icons.record_voice_over),
+                        value: voiceEnabled,
+                        onChanged: (value) {
+                          _safetyTts.setEnabled(value);
+
+                          setState(() {
+                            voiceEnabled = value;
+                          });
+                        },
+                      ),
+
+                      if (lastSafetyWarning.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(
+                            lastSafetyWarning,
+                            textAlign: TextAlign.center,
+                            maxLines: 2,
+                            style: const TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+
+                      const SizedBox(height: 8),
+
+                      Text(
+                        _speechOwnsAudio
+                            ? 'Озвучивание'
+                            : switch (_vosk.state) {
+                                VoskState.loadingModel =>
+                                  'Подготовка голосового ввода…',
+                                VoskState.listening =>
+                                  'Слушаю. Нажмите ещё раз для завершения',
+                                VoskState.processing =>
+                                  'Распознаю команду. Можно отменить',
+                                VoskState.commandExecution =>
+                                  'Выполняю команду',
+                                VoskState.error =>
+                                  'Распознавание недоступно. Можно повторить',
+                                _ =>
+                                  _voiceActionsAccepted
+                                      ? 'Нажмите микрофон: начать, закончить, что впереди, опиши окружение'
+                                      : 'Голос в режиме проверки. Для управления используйте кнопки.',
+                              },
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      ),
+
+                      const SizedBox(height: 8),
+
+                      if (recognizedVoiceText.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 4),
+                          child: Text(
+                            recognizedVoiceText,
+                            maxLines: 3,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                      const SizedBox(height: 8),
+
+                      OutlinedButton.icon(
+                        onPressed: activateVoiceCommand,
+                        icon: const Icon(Icons.mic),
+                        label: Text(
+                          processingVoiceCommand
+                              ? 'Завершить / отменить'
+                              : _voiceActionsAccepted
+                              ? 'Голосовая команда'
+                              : 'Проверить голос (без действий)',
+                        ),
+                      ),
+
+                      if (_vlm.statusText.isNotEmpty)
+                        Semantics(
+                          liveRegion: true,
+                          child: Text(
+                            _vlm.statusText,
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+
+                      if (processingVoiceCommand)
+                        TextButton(
+                          onPressed: () {
+                            _voiceRouter.cancel();
+                            unawaited(_vosk.cancel());
+                          },
+                          child: const Text('Отменить запись'),
+                        ),
+                    ],
                   ),
-
-                  const SizedBox(height: 8),
-
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (_vlmCameraMessage.isNotEmpty)
+                    Semantics(
+                      liveRegion: true,
+                      child: Text(
+                        _vlmCameraMessage,
+                        textAlign: TextAlign.center,
+                        maxLines: 2,
+                      ),
+                    ),
+                  FilledButton.icon(
+                    onPressed: _vlm.isBusy ? null : () => describeEnvironment(),
+                    icon: const Icon(Icons.image_search),
+                    label: Text(
+                      _vlm.isBusy
+                          ? (_vlm.state == VlmState.speaking
+                                ? 'Озвучиваю описание'
+                                : 'Анализирую изображение')
+                          : 'Описать окружение',
+                    ),
+                  ),
+                  if (_vlm.isBusy)
+                    TextButton(
+                      onPressed: cancelEnvironmentDescription,
+                      child: const Text('Отменить описание'),
+                    ),
+                  const SizedBox(height: 4),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -1570,6 +1546,9 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
   @override
   void dispose() {
+    _vlm.onChanged = null;
+    cancelEnvironmentDescription();
+    _vlm.dispose();
     ++_session;
     running = false;
 
@@ -1577,19 +1556,19 @@ class _LiveCameraPageState extends State<LiveCameraPage>
 
     WidgetsBinding.instance.removeObserver(this);
 
-    _wakeModeEnabled = false;
-    _wakeRestartTimer?.cancel();
-
     AndroidCameraCameraX.frameAdmission = null;
     AndroidCameraCameraX.frameProfile = null;
     AndroidCameraCameraX.analysisWidth = AndroidCameraCameraX.analysisHeight =
         0;
     _performance.dispose();
     _safetyTts.onSpeakingChanged = null;
+    _safetyTts.deferAlert = null;
     _safetyTts.onSpeechStarted = null;
-    _voiceCommands.onRecognitionMeasured = null;
-    unawaited(_voiceCommands.dispose());
-    unawaited(_wakeWord.dispose());
+    _vosk.onStateChanged = null;
+    _vosk.onMeasured = null;
+    unawaited(_vosk.dispose());
+    _vosk.onPartial = null;
+    _voiceRouter.cancel();
 
     unawaited(subscription?.cancel());
     unawaited(socket?.sink.close());

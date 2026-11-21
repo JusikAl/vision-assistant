@@ -15,6 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   image_picker: ^1.2.4
   http: ^1.6.0
+  http_parser: ^4.1.2
   camera: ^0.12.2
   camera_android_camerax: ^0.7.6
   web_socket_channel: ^3.0.3

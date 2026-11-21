@@ -48,7 +48,7 @@ void main() {
     ]);
     expect(
       alerts.map((a) => a.text),
-      containsAll(['Слева автомобиль', 'Справа автомобиль']),
+      ['Впереди несколько автомобилей'],
     );
     expect(alerts.every((a) => a.priority == 2), isTrue);
   });
@@ -174,5 +174,40 @@ void main() {
     expect(alerts, hasLength(1));
     expect(alerts.single.priority, 3);
     expect(alerts.single.text, isNot(contains('метр')));
+  });
+  test('chair moves across direction boundary and disappears', () {
+    frame([object('Chair', x: 20)]);
+    now = now.add(const Duration(milliseconds: 300));
+    expect(frame([object('Chair', x: 25)]).single.key, 'chair:left');
+    now = now.add(const Duration(milliseconds: 300));
+    expect(frame([object('Chair', x: 30)]).single.key, 'chair:center');
+    expect(frame([]), isEmpty);
+    now = now.add(const Duration(milliseconds: 300));
+    expect(frame([object('Chair', x: 30)]), isEmpty);
+  });
+  test(
+    'latency anchors include first camera observation and confirmation wait',
+    () {
+      frame([object('Car')], age: 400);
+      final firstResult = now;
+      now = now.add(const Duration(milliseconds: 350));
+      final alert = frame([object('Car')], age: 250).single;
+      expect(alert.firstResultAt, firstResult);
+      expect(
+        alert.firstCameraAt,
+        firstResult.subtract(const Duration(milliseconds: 400)),
+      );
+      expect(alert.confirmedAt, now);
+      expect(alert.observedAt, now.subtract(const Duration(milliseconds: 250)));
+    },
+  );
+  test('slow inference and camera pause invalidate temporal evidence', () {
+    confirm([object('Car')]);
+    now = now.add(const Duration(seconds: 3));
+    expect(frame([object('Car')], age: 1700), isEmpty);
+    now = now.add(const Duration(milliseconds: 300));
+    expect(frame([object('Car')]), isEmpty);
+    now = now.add(const Duration(milliseconds: 300));
+    expect(frame([object('Car')]), hasLength(1));
   });
 }

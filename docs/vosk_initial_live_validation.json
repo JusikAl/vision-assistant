@@ -1,0 +1,50 @@
+{
+  "device": "CPH2727",
+  "date": "2026-11-20",
+  "source": "User reported all four requested commands worked; two native results captured in tool output. Original complete logcat not retained. Not a 40-trial acceptance dataset.",
+  "configuration": {
+    "model": "vosk-model-small-ru-0.22",
+    "cpu_policy": "scheduler default; background priority 10",
+    "input": "AudioRecord PCM16/16000/mono; 20ms nonblocking read; grammar 11 phrases + unk"
+  },
+  "rows": [
+    {
+      "expected": "Начать",
+      "raw_text": "начать",
+      "session": 1,
+      "user_confirmed_success": true,
+      "running_after": true,
+      "native_compute_ms": 1152.811774,
+      "audio_ms": 4240,
+      "total_ms": 4485.322707,
+      "last_word_end_ms": 3480,
+      "alignment_after_speech_ms": 1005.322707
+    },
+    {
+      "expected": "Что впереди?",
+      "raw_text": null,
+      "user_confirmed_success": true,
+      "timing": null,
+      "note": "Not retained in available log output"
+    },
+    {
+      "expected": "Опиши окружение",
+      "raw_text": null,
+      "user_confirmed_success": true,
+      "timing": null,
+      "note": "Not retained in available log output"
+    },
+    {
+      "expected": "Закончить",
+      "raw_text": "закончить",
+      "session": 8,
+      "user_confirmed_success": true,
+      "running_after": false,
+      "native_compute_ms": 522.457031,
+      "audio_ms": 1840,
+      "total_ms": 2156.474009,
+      "last_word_end_ms": 990,
+      "alignment_after_speech_ms": 1166.474009
+    }
+  ]
+}

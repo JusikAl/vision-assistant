@@ -26,10 +26,11 @@ from fastapi import (
 from PIL import Image, UnidentifiedImageError
 from ultralytics import YOLO
 
-from depth_service import DepthService, DEPTH_MODEL_ID
 from depth_calibration import calibrate_distance
 from depth_stabilizer import DepthStabilizer
 from safety_service import SafetyService
+from vlm_router import create_vlm_router
+from vlm_service import VlmService, VlmNetworkAndBodyLimit
 
 
 # =====================================
@@ -40,6 +41,9 @@ app = FastAPI(
     title="AI Navigation Assistant",
     version="1.4.0",
 )
+vlm_service = VlmService()
+app.add_middleware(VlmNetworkAndBodyLimit, settings=vlm_service.settings)
+app.include_router(create_vlm_router(vlm_service))
 
 logger = logging.getLogger("uvicorn.error")
 
@@ -265,6 +269,8 @@ logger.info(
 depth_service = None
 
 if DEPTH_ENABLED:
+    # Keep the optional Depth mode independent of the on-demand VLM route.
+    from depth_service import DepthService, DEPTH_MODEL_ID
     depth_service = DepthService()
 
 

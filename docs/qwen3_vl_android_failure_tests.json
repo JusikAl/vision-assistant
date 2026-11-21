@@ -1,0 +1,87 @@
+{
+  "run_id": "1795203240613122800",
+  "results": [
+    {
+      "case": "duplicate_tap",
+      "passed": true
+    },
+    {
+      "case": "cancel_request",
+      "passed": false
+    },
+    {
+      "case": "background_invalidates_request",
+      "passed": true
+    },
+    {
+      "case": "wifi_loss",
+      "passed": true,
+      "observed": [
+        {
+          "time": "2026-11-20T19:34:32.227428Z",
+          "phase": "1795203240613122800-wifi",
+          "scene": "Комната / мебель",
+          "type": "error",
+          "status": "Подробное описание сейчас недоступно",
+          "detector_running": true
+        }
+      ]
+    },
+    {
+      "case": "fastapi_unavailable",
+      "passed": true,
+      "errors": [
+        {
+          "time": "2026-11-20T19:35:04.003229Z",
+          "phase": "1795203240613122800-fastapi_down",
+          "scene": "Комната / мебель",
+          "type": "error",
+          "status": "Подробное описание сейчас недоступно",
+          "detector_running": true
+        }
+      ]
+    },
+    {
+      "case": "ollama_unavailable",
+      "passed": true,
+      "note": "Same backend configured to unreachable local Ollama port 11435; model/process unchanged.",
+      "errors": [
+        {
+          "time": "2026-11-20T19:35:21.769379Z",
+          "phase": "1795203240613122800-ollama_down",
+          "scene": "Комната / мебель",
+          "type": "error",
+          "status": "Подробное описание сейчас недоступно",
+          "detector_running": true
+        }
+      ]
+    },
+    {
+      "case": "backend_timeout",
+      "passed": true,
+      "note": "Same backend with VLM_TIMEOUT_SECONDS=1; normal setting is 45.",
+      "errors": [
+        {
+          "time": "2026-11-20T19:35:35.491670Z",
+          "phase": "1795203240613122800-timeout",
+          "scene": "Комната / мебель",
+          "type": "error",
+          "status": "Подробное описание сейчас недоступно",
+          "detector_running": true
+        }
+      ]
+    },
+    {
+      "case": "reconnect",
+      "passed": true
+    },
+    {
+      "case": "close_camera_invalidates",
+      "passed": true
+    },
+    {
+      "case": "camera_off_no_snapshot",
+      "passed": true
+    }
+  ]
+}

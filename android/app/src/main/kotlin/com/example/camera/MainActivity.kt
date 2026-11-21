@@ -7,8 +7,10 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity : FlutterActivity() {
+    private var vosk: VoskBridge? = null
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
+        vosk = VoskBridge(this, flutterEngine.dartExecutor.binaryMessenger)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "navigation/performance")
             .setMethodCallHandler { call, result ->
                 if (call.method != "snapshot") {
@@ -32,5 +34,18 @@ class MainActivity : FlutterActivity() {
                     ))
                 }
             }
+    }
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        vosk?.onPermissionResult(requestCode, grantResults)
+    }
+    override fun onStop() {
+        vosk?.cancel()
+        super.onStop()
+    }
+    override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
+        vosk?.close()
+        vosk = null
+        super.cleanUpFlutterEngine(flutterEngine)
     }
 }

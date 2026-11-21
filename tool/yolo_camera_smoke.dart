@@ -54,13 +54,20 @@ Future<void> _exerciseCamera(GlobalKey key) async {
       final samples = <Map<String, double>>[];
       DateTime? previous;
       final measurement = Stopwatch()..start();
-      while (measurement.elapsed < const Duration(seconds: 8)) {
+      final seconds = session == sessions
+          ? const int.fromEnvironment(
+              'CAMERA_SMOKE_LAST_SECONDS',
+              defaultValue: 8,
+            )
+          : const int.fromEnvironment('CAMERA_SMOKE_SECONDS', defaultValue: 8);
+      while (measurement.elapsed < Duration(seconds: seconds)) {
         final DateTime? resultAt = state.lastResult;
         if (resultAt != null && resultAt != previous) {
           previous = resultAt;
           samples.add({
             'inference_ms': state.yoloMs as double,
             'frame_ms': state.processingMs as double,
+            'camera_to_result_ms': state.cameraToResultMs as double,
             'preprocess_ms': state.offlinePreprocessMs as double,
             'postprocess_ms': state.offlinePostprocessMs as double,
           });
@@ -98,6 +105,7 @@ Future<void> _exerciseCamera(GlobalKey key) async {
       for (final metric in [
         'inference_ms',
         'frame_ms',
+        'camera_to_result_ms',
         'preprocess_ms',
         'postprocess_ms',
       ]) {
@@ -110,6 +118,7 @@ Future<void> _exerciseCamera(GlobalKey key) async {
       for (final metric in [
         'inference_ms',
         'frame_ms',
+        'camera_to_result_ms',
         'preprocess_ms',
         'postprocess_ms',
       ]) {

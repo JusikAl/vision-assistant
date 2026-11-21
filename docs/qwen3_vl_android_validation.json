@@ -1,0 +1,1887 @@
+[
+  {
+    "time": "2026-11-20T19:21:53.247400Z",
+    "phase": "camera_off",
+    "scene": "Комната / мебель",
+    "type": "assertion",
+    "check": "camera_off_no_upload",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:22:08.674998Z",
+    "phase": "baseline",
+    "scene": "Комната / мебель",
+    "type": "throughput",
+    "window_ms": 10012,
+    "results": 22,
+    "results_per_second": 2.2,
+    "camera_p50_ms": 173.668,
+    "camera_p95_ms": 1288.889
+  },
+  {
+    "time": "2026-11-20T19:22:09.516142Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Комната / мебель",
+    "type": "assertion",
+    "check": "duplicate_tap_ignored",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:22:12.010487Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202528675322-2",
+      "status": "success",
+      "description": "На снимке изображена полностью черная поверхность, без видимых объектов, людей, дверей, лестниц или других деталей. Окружение не видно, и на изображении нет никаких элементов, которые можно определить по местоположению.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:22:09.143104+00:00",
+      "processing_ms": 2437.95,
+      "preprocessing_ms": 6.2,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 8.58,
+        "prompt_eval_ms": 1296.75,
+        "eval_ms": 674.73,
+        "total_ms": 2157.03
+      },
+      "http_ms": 2510.028,
+      "capture_preprocessing_ms": 356.882,
+      "jpeg_bytes": 10101,
+      "full_response_ms": 3334.864
+    },
+    "detector_running": true,
+    "yolo_fps": 3.7124623649127755,
+    "camera_to_result_ms": 235.825,
+    "rss_bytes": 267034624
+  },
+  {
+    "time": "2026-11-20T19:22:12.038987Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Комната / мебель",
+    "type": "assertion",
+    "check": "critical_preempts_vlm",
+    "passed": true,
+    "note": "Injected confirmed priority-3 TEST alert; not a real obstacle detection."
+  },
+  {
+    "time": "2026-11-20T19:22:12.039348Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Комната / мебель",
+    "type": "assertion",
+    "check": "cancel_vlm_preserves_critical",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:22:14.250208Z",
+    "phase": "cancel_http",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:22:14.250665Z",
+    "phase": "cancel_http",
+    "scene": "Комната / мебель",
+    "type": "assertion",
+    "check": "cancelled_result_not_spoken",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:22:16.592917Z",
+    "phase": "close_camera",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:22:16.600987Z",
+    "phase": "close_camera",
+    "scene": "Комната / мебель",
+    "type": "assertion",
+    "check": "close_camera_invalidates_request",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:22:19.909084Z",
+    "phase": "throughput_with_vlm",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202536926398-8",
+      "status": "success",
+      "description": "На снимке изображена полностью черная поверхность, без видимых объектов, людей, дверей, лестниц или других деталей. Сцена не содержит никаких элементов, которые можно определить по местоположению. Описание невозможно выполнить из-за отсутствия света и видимых деталей.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:22:16.976352+00:00",
+      "processing_ms": 2304.92,
+      "preprocessing_ms": 2.58,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 15.0,
+        "prompt_eval_ms": 1176.8,
+        "eval_ms": 748.42,
+        "total_ms": 2056.64
+      },
+      "http_ms": 2667.023,
+      "capture_preprocessing_ms": 265.317,
+      "jpeg_bytes": 10153,
+      "full_response_ms": 2982.412
+    },
+    "detector_running": true,
+    "yolo_fps": 3.245056966975055,
+    "camera_to_result_ms": 296.851,
+    "rss_bytes": 273809408
+  },
+  {
+    "time": "2026-11-20T19:22:39.650075Z",
+    "phase": "throughput_with_vlm",
+    "scene": "Комната / мебель",
+    "type": "throughput",
+    "window_ms": 10010,
+    "results": 35,
+    "results_per_second": 3.5,
+    "camera_p50_ms": 211.372,
+    "camera_p95_ms": 469.669
+  },
+  {
+    "time": "2026-11-20T19:22:52.403171Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202569463535-9",
+      "status": "success",
+      "description": "На снимке видна кровать с ярким синим покрывалом с узорами, расположенная на полу с резиновым ковром. Слева от кровати виден светлый пол, а справа — стена с текстурной поверхностью. Кровать находится в центре кадра, и на полу слева виден угол ковра.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:22:49.594619+00:00",
+      "processing_ms": 2419.57,
+      "preprocessing_ms": 3.98,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 6.37,
+        "prompt_eval_ms": 1112.31,
+        "eval_ms": 874.97,
+        "total_ms": 2159.92
+      },
+      "http_ms": 2576.796,
+      "capture_preprocessing_ms": 231.258,
+      "jpeg_bytes": 40984,
+      "full_response_ms": 2939.284
+    },
+    "detector_running": true,
+    "yolo_fps": 3.236340217028975,
+    "camera_to_result_ms": 285.967,
+    "rss_bytes": 273825792
+  },
+  {
+    "time": "2026-11-20T19:23:13.338249Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "human_review",
+    "request_id": "vlm-1795202569463535-9",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:23:23.427642Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202600902492-10",
+      "status": "success",
+      "description": "На снимке виден светлый деревянный шкаф с вертикальными полосами текстуры дерева и металлической ручкой. Слева от шкафа находится открытая полка с предметами, а справа — часть кровати с голубым покрывалом и серым фоном с текстурой.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:23:20.927552+00:00",
+      "processing_ms": 2144.98,
+      "preprocessing_ms": 6.25,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 5.36,
+        "prompt_eval_ms": 976.47,
+        "eval_ms": 748.78,
+        "total_ms": 1901.92
+      },
+      "http_ms": 2293.163,
+      "capture_preprocessing_ms": 206.559,
+      "jpeg_bytes": 33198,
+      "full_response_ms": 2524.974
+    },
+    "detector_running": true,
+    "yolo_fps": 5.9649855349100775,
+    "camera_to_result_ms": 136.419,
+    "rss_bytes": 268935168
+  },
+  {
+    "time": "2026-11-20T19:23:44.449652Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "human_review",
+    "request_id": "vlm-1795202600902492-10",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:23:50.581955Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202627564933-11",
+      "status": "success",
+      "description": "На снимке видна деревянная полка с книгами и предметами. На верхней полке стоит банка с красной крышкой, а на нижней — ряд книг, включая \"Climber Knight\" и \"HTML5 in CSS\". Справа от книг находится синий бутылочный контейнер и белый адаптер. На заднем плане — стена с узорчатым обоями.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:23:47.653579+00:00",
+      "processing_ms": 2511.44,
+      "preprocessing_ms": 2.84,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 7.28,
+        "prompt_eval_ms": 1133.4,
+        "eval_ms": 961.38,
+        "total_ms": 2270.25
+      },
+      "http_ms": 2593.973,
+      "capture_preprocessing_ms": 333.962,
+      "jpeg_bytes": 48179,
+      "full_response_ms": 3016.732
+    },
+    "detector_running": true,
+    "yolo_fps": 5.611514828427934,
+    "camera_to_result_ms": 152.722,
+    "rss_bytes": 268181504
+  },
+  {
+    "time": "2026-11-20T19:24:20.361382Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "human_review",
+    "request_id": "vlm-1795202627564933-11",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:24:53.128911Z",
+    "phase": "manual",
+    "scene": "Дверь",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202689974988-12",
+      "status": "success",
+      "description": "На снимке видна комната с белыми стенами и светлым ламинатным полом. Слева находится открытое дверное проем, справа — дверь с ручкой и стул с подушками. В комнате нет людей.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:24:50.320149+00:00",
+      "processing_ms": 2340.14,
+      "preprocessing_ms": 4.65,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 7.27,
+        "prompt_eval_ms": 1193.11,
+        "eval_ms": 614.88,
+        "total_ms": 2011.49
+      },
+      "http_ms": 2475.086,
+      "capture_preprocessing_ms": 333.018,
+      "jpeg_bytes": 30650,
+      "full_response_ms": 3153.477
+    },
+    "detector_running": true,
+    "yolo_fps": 5.320365828354357,
+    "camera_to_result_ms": 171.148,
+    "rss_bytes": 262004736
+  },
+  {
+    "time": "2026-11-20T19:25:09.366602Z",
+    "phase": "manual",
+    "scene": "Дверь",
+    "type": "human_review",
+    "request_id": "vlm-1795202689974988-12",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:25:19.857631Z",
+    "phase": "camera_off",
+    "scene": "Дверь",
+    "type": "assertion",
+    "check": "camera_off_no_upload",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:25:30.114572Z",
+    "phase": "baseline",
+    "scene": "Дверь",
+    "type": "throughput",
+    "window_ms": 10005,
+    "results": 50,
+    "results_per_second": 5.0,
+    "camera_p50_ms": 157.123,
+    "camera_p95_ms": 221.943
+  },
+  {
+    "time": "2026-11-20T19:25:30.405372Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Дверь",
+    "type": "assertion",
+    "check": "duplicate_tap_ignored",
+    "passed": true
+  },
+  {
+    "time": "2026-11-20T19:25:32.876428Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Дверь",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202730115920-14",
+      "status": "success",
+      "description": "На снимке виден рабочий стол с ноутбуком, на котором отображается экран с текстом. Слева от ноутбука лежит черный наушник, а в центре — клавиатура. На заднем плане видна часть стены с тканевым покрытием и деревянная дверь.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:25:30.147362+00:00",
+      "processing_ms": 2332.43,
+      "preprocessing_ms": 7.59,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 5.48,
+        "prompt_eval_ms": 1054.2,
+        "eval_ms": 819.2,
+        "total_ms": 2048.6
+      },
+      "http_ms": 2486.21,
+      "capture_preprocessing_ms": 242.486,
+      "jpeg_bytes": 37278,
+      "full_response_ms": 2760.204
+    },
+    "detector_running": true,
+    "yolo_fps": 5.609626118419207,
+    "camera_to_result_ms": 154.266,
+    "rss_bytes": 264413184
+  },
+  {
+    "time": "2026-11-20T19:25:35.907886Z",
+    "phase": "vlm_and_critical_tts",
+    "scene": "Дверь",
+    "type": "validation_error",
+    "error": "TimeoutException: Validation timed out"
+  },
+  {
+    "time": "2026-11-20T19:27:02.989529Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202819802969-1",
+      "status": "success",
+      "description": "На снимке видна часть светлого деревянного шкафа с несколькими полками. На верхней полке лежит прозрачный пластиковый контейнер с ручкой, а также несколько листов бумаги. Слева от шкафа видна тканевая занавеска. На одной из нижних полок лежит стопка бумаги, а справа от шкафа находится белая рамка с фотографией.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:27:00.000438+00:00",
+      "processing_ms": 2614.75,
+      "preprocessing_ms": 4.39,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 7.14,
+        "prompt_eval_ms": 1145.71,
+        "eval_ms": 1034.62,
+        "total_ms": 2356.3
+      },
+      "http_ms": 2690.299,
+      "capture_preprocessing_ms": 297.955,
+      "jpeg_bytes": 42193,
+      "full_response_ms": 3186.119
+    },
+    "detector_running": true,
+    "yolo_fps": 3.205785802215839,
+    "camera_to_result_ms": 295.36,
+    "rss_bytes": 270704640
+  },
+  {
+    "time": "2026-11-20T19:27:29.169543Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "human_review",
+    "request_id": "vlm-1795202819802969-1",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:27:35.228914Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202852296022-2",
+      "status": "success",
+      "description": "На снимке видна часть деревянной полки с книгами, фотографией и пластиковым контейнером с канцелярскими принадлежностями. На верхней полке стоит банка с надписью \"801\", а слева на полке лежат бумаги. На заднем плане — стена с узорчатым обоями.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:27:32.413538+00:00",
+      "processing_ms": 2464.58,
+      "preprocessing_ms": 3.99,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 6.56,
+        "prompt_eval_ms": 1117.75,
+        "eval_ms": 837.9,
+        "total_ms": 2137.69
+      },
+      "http_ms": 2600.317,
+      "capture_preprocessing_ms": 214.51,
+      "jpeg_bytes": 58274,
+      "full_response_ms": 2932.542
+    },
+    "detector_running": true,
+    "yolo_fps": 5.368752785040507,
+    "camera_to_result_ms": 167.678,
+    "rss_bytes": 272228352
+  },
+  {
+    "time": "2026-11-20T19:27:56.884124Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "human_review",
+    "request_id": "vlm-1795202852296022-2",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:28:10.568903Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202887559945-3",
+      "status": "success",
+      "description": "На снимке видна комната с деревянными дверями и большим зеркалом, отражающим человека в кресле. В комнате есть стол с компьютером, стул на колесиках, книжный шкаф и люстра. Зеркало отражает часть потолка и светильника.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:28:07.837125+00:00",
+      "processing_ms": 2214.37,
+      "preprocessing_ms": 3.3,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 4.99,
+        "prompt_eval_ms": 1032.35,
+        "eval_ms": 710.8,
+        "total_ms": 1940.62
+      },
+      "http_ms": 2381.775,
+      "capture_preprocessing_ms": 349.057,
+      "jpeg_bytes": 35570,
+      "full_response_ms": 3008.699
+    },
+    "detector_running": true,
+    "yolo_fps": 3.485000557600089,
+    "camera_to_result_ms": 242.4,
+    "rss_bytes": 273571840
+  },
+  {
+    "time": "2026-11-20T19:28:30.256981Z",
+    "phase": "manual",
+    "scene": "Комната / мебель",
+    "type": "human_review",
+    "request_id": "vlm-1795202887559945-3",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:28:43.225175Z",
+    "phase": "manual",
+    "scene": "Дверь",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795202920189567-4",
+      "status": "success",
+      "description": "На снимке видна комната с серыми стенами и белой мебелью. Слева находится открытая дверь, ведущая в другое помещение, справа — дверь с ручкой и настенное электропитание. В правом нижнем углу видны подушки на кровати.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:28:40.368454+00:00",
+      "processing_ms": 2398.0,
+      "preprocessing_ms": 4.43,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 5.72,
+        "prompt_eval_ms": 1071.02,
+        "eval_ms": 791.71,
+        "total_ms": 2053.62
+      },
+      "http_ms": 2531.09,
+      "capture_preprocessing_ms": 325.156,
+      "jpeg_bytes": 29293,
+      "full_response_ms": 3035.372
+    },
+    "detector_running": true,
+    "yolo_fps": 4.345294480606951,
+    "camera_to_result_ms": 190.594,
+    "rss_bytes": 284930048
+  },
+  {
+    "time": "2026-11-20T19:29:00.456934Z",
+    "phase": "manual",
+    "scene": "Дверь",
+    "type": "human_review",
+    "request_id": "vlm-1795202920189567-4",
+    "objects_and_directions_correct": true
+  },
+  {
+    "time": "2026-11-20T19:34:00.342085Z",
+    "phase": "1795203240613122800-prepare",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203240613127200",
+    "action": "start"
+  },
+  {
+    "time": "2026-11-20T19:34:00.346179Z",
+    "phase": "1795203240613122800-prepare",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203240613127200",
+    "running": true
+  },
+  {
+    "time": "2026-11-20T19:34:00.782921Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203241044914900",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:34:00.784294Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:01.342813Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:01.555806Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203241851563000",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:34:01.557233Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203241851563000",
+    "result_present": false,
+    "state": "processing"
+  },
+  {
+    "time": "2026-11-20T19:34:03.668262Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:03.669530Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203240784204-1",
+      "status": "success",
+      "description": "На снимке изображена полностью черная поверхность, что указывает на отсутствие видимых объектов, людей, дверей, лестниц или других заметных деталей. Описание невозможно выполнить, так как изображение не содержит информации о внешней среде.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:34:01.048815+00:00",
+      "processing_ms": 2254.2,
+      "preprocessing_ms": 5.6,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 15.36,
+        "prompt_eval_ms": 1091.61,
+        "eval_ms": 610.33,
+        "total_ms": 1915.54
+      },
+      "http_ms": 2323.594,
+      "capture_preprocessing_ms": 293.755,
+      "jpeg_bytes": 10671,
+      "full_response_ms": 2883.944
+    },
+    "detector_running": true,
+    "yolo_fps": 4.7928988410770605,
+    "camera_to_result_ms": 185.32,
+    "rss_bytes": 274116608
+  },
+  {
+    "time": "2026-11-20T19:34:22.382066Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "idle",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:22.383476Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203241044914900",
+    "result_present": true,
+    "state": "idle"
+  },
+  {
+    "time": "2026-11-20T19:34:26.149020Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203266373268500",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:34:26.150124Z",
+    "phase": "1795203240613122800-cancel",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203266373268500",
+    "state": "idle"
+  },
+  {
+    "time": "2026-11-20T19:34:26.758172Z",
+    "phase": "1795203240613122800-background",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203267074062600",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:34:26.759456Z",
+    "phase": "1795203240613122800-background",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:27.207274Z",
+    "phase": "1795203240613122800-background",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:27.854467Z",
+    "phase": "1795203240613122800-background",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:27.856807Z",
+    "phase": "1795203240613122800-background",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:27.860437Z",
+    "phase": "1795203240613122800-background",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203267074062600",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:34:30.348472Z",
+    "phase": "1795203240613122800-wifi",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203270647399400",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:34:30.349571Z",
+    "phase": "1795203240613122800-wifi",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:31.037679Z",
+    "phase": "1795203240613122800-wifi",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:32.226227Z",
+    "phase": "1795203240613122800-wifi",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "error",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:32.227428Z",
+    "phase": "1795203240613122800-wifi",
+    "scene": "Комната / мебель",
+    "type": "error",
+    "status": "Подробное описание сейчас недоступно",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:36.159629Z",
+    "phase": "1795203240613122800-wifi",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203270647399400",
+    "result_present": false,
+    "state": "error"
+  },
+  {
+    "time": "2026-11-20T19:34:45.752308Z",
+    "phase": "1795203240613122800-fastapi_down",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203286118444700",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:34:45.753740Z",
+    "phase": "1795203240613122800-fastapi_down",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:34:46.582238Z",
+    "phase": "1795203240613122800-fastapi_down",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:04.001535Z",
+    "phase": "1795203240613122800-fastapi_down",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "error",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:04.003229Z",
+    "phase": "1795203240613122800-fastapi_down",
+    "scene": "Комната / мебель",
+    "type": "error",
+    "status": "Подробное описание сейчас недоступно",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:07.046658Z",
+    "phase": "1795203240613122800-fastapi_down",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203286118444700",
+    "result_present": false,
+    "state": "error"
+  },
+  {
+    "time": "2026-11-20T19:35:18.948852Z",
+    "phase": "1795203240613122800-ollama_down",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203319201662800",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:35:18.950268Z",
+    "phase": "1795203240613122800-ollama_down",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:19.234101Z",
+    "phase": "1795203240613122800-ollama_down",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:21.768038Z",
+    "phase": "1795203240613122800-ollama_down",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "error",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:21.769379Z",
+    "phase": "1795203240613122800-ollama_down",
+    "scene": "Комната / мебель",
+    "type": "error",
+    "status": "Подробное описание сейчас недоступно",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:24.839060Z",
+    "phase": "1795203240613122800-ollama_down",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203319201662800",
+    "result_present": false,
+    "state": "error"
+  },
+  {
+    "time": "2026-11-20T19:35:32.352319Z",
+    "phase": "1795203240613122800-timeout",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203332650383800",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:35:32.353858Z",
+    "phase": "1795203240613122800-timeout",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:32.657330Z",
+    "phase": "1795203240613122800-timeout",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:35.490243Z",
+    "phase": "1795203240613122800-timeout",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "error",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:35.491670Z",
+    "phase": "1795203240613122800-timeout",
+    "scene": "Комната / мебель",
+    "type": "error",
+    "status": "Подробное описание сейчас недоступно",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:38.518896Z",
+    "phase": "1795203240613122800-timeout",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203332650383800",
+    "result_present": false,
+    "state": "error"
+  },
+  {
+    "time": "2026-11-20T19:35:45.748641Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203346011099400",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:35:45.750138Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:46.066266Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:48.809340Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:35:48.810848Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203345750104-13",
+      "status": "success",
+      "description": "На снимке видна часть деревянной стойки с несколькими ящиками, в верхнем ящике находится синий предмет, а в нижнем — стопка бумаг и папок. Слева от стойки виден черный предмет, похожий на очки, а справа — часть стола. На стене за стойкой виден узорчатый фон.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:35:45.808856+00:00",
+      "processing_ms": 2568.23,
+      "preprocessing_ms": 25.14,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 12.25,
+        "prompt_eval_ms": 1155.26,
+        "eval_ms": 916.37,
+        "total_ms": 2267.57
+      },
+      "http_ms": 2741.638,
+      "capture_preprocessing_ms": 257.321,
+      "jpeg_bytes": 37446,
+      "full_response_ms": 3059.186
+    },
+    "detector_running": true,
+    "yolo_fps": 3.3440789737690446,
+    "camera_to_result_ms": 259.307,
+    "rss_bytes": 276176896
+  },
+  {
+    "time": "2026-11-20T19:36:08.837280Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "idle",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:08.839028Z",
+    "phase": "1795203240613122800-reconnect",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203346011099400",
+    "result_present": true,
+    "state": "idle"
+  },
+  {
+    "time": "2026-11-20T19:36:09.347050Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203369544051400",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:36:09.349035Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:09.781574Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:10.156082Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203370440308200",
+    "action": "stop"
+  },
+  {
+    "time": "2026-11-20T19:36:10.158469Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:10.160511Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:10.162940Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203369544051400",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:36:10.174433Z",
+    "phase": "1795203240613122800-close_camera",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203370440308200",
+    "running": false
+  },
+  {
+    "time": "2026-11-20T19:36:10.741836Z",
+    "phase": "1795203240613122800-camera_off",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203371032324400",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:36:10.744067Z",
+    "phase": "1795203240613122800-camera_off",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203371032324400",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:36:11.142144Z",
+    "phase": "1795203240613122800-restored",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203371418324100",
+    "action": "start"
+  },
+  {
+    "time": "2026-11-20T19:36:11.144646Z",
+    "phase": "1795203240613122800-restored",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203371418324100",
+    "running": true
+  },
+  {
+    "time": "2026-11-20T19:36:41.954654Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203402278541500",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:36:41.957930Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:42.325807Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:42.744847Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203403009553600",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:36:42.747134Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:42.749391Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:36:42.751286Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203403009553600",
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:36:42.753940Z",
+    "phase": "cancel-followup-1795203402278538800",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203402278541500",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:38:36.154587Z",
+    "phase": "performance-1-baseline",
+    "scene": "Комната / мебель",
+    "type": "throughput",
+    "window_ms": 20013,
+    "results": 66,
+    "results_per_second": 3.3,
+    "camera_p50_ms": 249.095,
+    "camera_p95_ms": 514.864,
+    "vlm_active": false,
+    "requests_attempted": 0,
+    "cpu_ms": 53885,
+    "rss_bytes": 272351232,
+    "note": "Two bounded on-demand requests planned; shared TTS and real Safety remain active."
+  },
+  {
+    "time": "2026-11-20T19:38:36.197544Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:36.546546Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:39.207111Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:39.210158Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203516197434-2",
+      "status": "success",
+      "description": "На снимке видна часть рабочего стола с папками, бумагами и предметами, расположенными на столе. Слева находится деревянная полка с предметами, а справа — часть стола с телефоном и другими вещами. На заднем плане видна стена с узорчатой тканью.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:38:36.233046+00:00",
+      "processing_ms": 2474.72,
+      "preprocessing_ms": 3.19,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 14.15,
+        "prompt_eval_ms": 1153.19,
+        "eval_ms": 743.75,
+        "total_ms": 2108.28
+      },
+      "http_ms": 2658.167,
+      "capture_preprocessing_ms": 313.304,
+      "jpeg_bytes": 40292,
+      "full_response_ms": 3009.497
+    },
+    "detector_running": true,
+    "yolo_fps": 3.774923935282704,
+    "camera_to_result_ms": 240.881,
+    "rss_bytes": 275009536
+  },
+  {
+    "time": "2026-11-20T19:38:56.245577Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:56.247980Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:56.273833Z",
+    "phase": "performance-2-vlm",
+    "scene": "Комната / мебель",
+    "type": "throughput",
+    "window_ms": 20019,
+    "results": 69,
+    "results_per_second": 3.45,
+    "camera_p50_ms": 236.15,
+    "camera_p95_ms": 411.787,
+    "vlm_active": true,
+    "requests_attempted": 1,
+    "cpu_ms": 56303,
+    "rss_bytes": 270663680,
+    "note": "Two bounded on-demand requests planned; shared TTS and real Safety remain active."
+  },
+  {
+    "time": "2026-11-20T19:38:56.317822Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:56.822043Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:59.464260Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:38:59.466332Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203536317778-4",
+      "status": "success",
+      "description": "На снимке видна часть рабочего стола с стопкой бумаг и папок, а также часть стойки с личными вещами. Слева находится синий предмет, похожий на коврик или подставка, а справа — фиолетовый объект, возможно, телефон или планшет. На столе также лежит черный кабель, и на заднем плане видна стена с узорчатой тканью.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:38:56.520150+00:00",
+      "processing_ms": 2504.94,
+      "preprocessing_ms": 4.62,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 5.25,
+        "prompt_eval_ms": 1057.9,
+        "eval_ms": 1044.24,
+        "total_ms": 2274.97
+      },
+      "http_ms": 2640.035,
+      "capture_preprocessing_ms": 301.768,
+      "jpeg_bytes": 39899,
+      "full_response_ms": 3146.373
+    },
+    "detector_running": true,
+    "yolo_fps": 3.707232439766741,
+    "camera_to_result_ms": 223.43,
+    "rss_bytes": 269463552
+  },
+  {
+    "time": "2026-11-20T19:39:16.348052Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:39:16.350104Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:39:16.370957Z",
+    "phase": "performance-3-vlm",
+    "scene": "Комната / мебель",
+    "type": "throughput",
+    "window_ms": 20000,
+    "results": 68,
+    "results_per_second": 3.4,
+    "camera_p50_ms": 234.493,
+    "camera_p95_ms": 459.595,
+    "vlm_active": true,
+    "requests_attempted": 1,
+    "cpu_ms": 55661,
+    "rss_bytes": 269156352,
+    "note": "Two bounded on-demand requests planned; shared TTS and real Safety remain active."
+  },
+  {
+    "time": "2026-11-20T19:39:36.443015Z",
+    "phase": "performance-4-baseline",
+    "scene": "Комната / мебель",
+    "type": "throughput",
+    "window_ms": 20003,
+    "results": 84,
+    "results_per_second": 4.2,
+    "camera_p50_ms": 201.535,
+    "camera_p95_ms": 265.656,
+    "vlm_active": false,
+    "requests_attempted": 0,
+    "cpu_ms": 61442,
+    "rss_bytes": 275312640,
+    "note": "Two bounded on-demand requests planned; shared TTS and real Safety remain active."
+  },
+  {
+    "time": "2026-11-20T19:45:48.404121Z",
+    "phase": "latency-prepare",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203948750593800",
+    "action": "start"
+  },
+  {
+    "time": "2026-11-20T19:45:48.408172Z",
+    "phase": "latency-prepare",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203948750593800",
+    "running": true
+  },
+  {
+    "time": "2026-11-20T19:45:48.821188Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203948997541300",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:45:48.823639Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:49.758245Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:52.451127Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:52.454429Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203948823546-1",
+      "status": "success",
+      "description": "На снимке видна часть интерьера, включая серый шторный материал, который находится справа, и часть деревянной мебели слева. Внизу виден белый потолок, а в центре — часть стены с белой линией, возможно, краем двери или карниза.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:45:49.386325+00:00",
+      "processing_ms": 2554.65,
+      "preprocessing_ms": 4.62,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 69.26,
+        "prompt_eval_ms": 1157.6,
+        "eval_ms": 760.52,
+        "total_ms": 2187.83
+      },
+      "http_ms": 2690.147,
+      "capture_preprocessing_ms": 371.629,
+      "jpeg_bytes": 22725,
+      "full_response_ms": 3627.517
+    },
+    "detector_running": true,
+    "yolo_fps": 3.6627621622017594,
+    "camera_to_result_ms": 227.358,
+    "rss_bytes": 267366400
+  },
+  {
+    "time": "2026-11-20T19:45:53.029942Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203953226446700",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:45:53.033744Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:53.036293Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:53.038560Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203953226446700",
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:45:53.047145Z",
+    "phase": "latency-1795203948997537900",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203948997541300",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:45:53.613398Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203953948559200",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:45:53.615906Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:54.374629Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:56.858538Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:56.861863Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203953615862-3",
+      "status": "success",
+      "description": "На снимке видна часть интерьера, включая серый шторный карниз, который находится вдоль стены. Слева от него виден деревянный шкаф с книгами и пластиковым контейнером. Внизу, на стене, виден светлый участок, возможно, от светильника.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:45:54.050563+00:00",
+      "processing_ms": 2338.97,
+      "preprocessing_ms": 2.89,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 6.52,
+        "prompt_eval_ms": 1127.92,
+        "eval_ms": 764.38,
+        "total_ms": 2024.6
+      },
+      "http_ms": 2481.439,
+      "capture_preprocessing_ms": 323.999,
+      "jpeg_bytes": 22784,
+      "full_response_ms": 3242.539
+    },
+    "detector_running": true,
+    "yolo_fps": 4.827419744146754,
+    "camera_to_result_ms": 167.589,
+    "rss_bytes": 281812992
+  },
+  {
+    "time": "2026-11-20T19:45:57.406140Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203957603074700",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:45:57.409756Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:57.413483Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:57.415823Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203957603074700",
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:45:57.425206Z",
+    "phase": "latency-1795203953948556700",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203953948559200",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:45:58.004906Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203958317771200",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:45:58.007347Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:45:58.677601Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:01.157575Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:01.160546Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203958007304-5",
+      "status": "success",
+      "description": "На снимке видна часть интерьера с серым шторным материалом, который находится справа. Слева виден деревянный шкаф с книгами и пластиковыми контейнерами. Внизу, на стене, виден белый карниз, а вверху — часть светлой стены.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:45:58.338651+00:00",
+      "processing_ms": 2377.65,
+      "preprocessing_ms": 4.38,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 12.22,
+        "prompt_eval_ms": 1156.77,
+        "eval_ms": 713.09,
+        "total_ms": 2048.53
+      },
+      "http_ms": 2476.376,
+      "capture_preprocessing_ms": 338.83,
+      "jpeg_bytes": 22888,
+      "full_response_ms": 3150.135
+    },
+    "detector_running": true,
+    "yolo_fps": 3.269886633030433,
+    "camera_to_result_ms": 272.863,
+    "rss_bytes": 272662528
+  },
+  {
+    "time": "2026-11-20T19:46:01.809313Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203962003670500",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:46:01.812326Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:01.814970Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:01.817747Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203962003670500",
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:46:01.834452Z",
+    "phase": "latency-1795203958317768500",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203958317771200",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:46:02.406205Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203962710879500",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:46:02.409444Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:02.948334Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:05.458582Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:05.461516Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203962409402-7",
+      "status": "success",
+      "description": "На снимке видна часть интерьера, включая серую тканевую штору, которая находится справа, и часть деревянного шкафа или стола в левом верхнем углу. На стене слева виден белый карниз и пластиковый контейнер с красной крышкой. Слева от шкафа виден светлый потолок.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:46:02.550307+00:00",
+      "processing_ms": 2357.87,
+      "preprocessing_ms": 2.33,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 5.52,
+        "prompt_eval_ms": 1131.98,
+        "eval_ms": 865.56,
+        "total_ms": 2130.24
+      },
+      "http_ms": 2507.166,
+      "capture_preprocessing_ms": 397.915,
+      "jpeg_bytes": 22754,
+      "full_response_ms": 3049.112
+    },
+    "detector_running": true,
+    "yolo_fps": 3.3741265229963595,
+    "camera_to_result_ms": 244.349,
+    "rss_bytes": 273481728
+  },
+  {
+    "time": "2026-11-20T19:46:05.830259Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203966146961000",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:46:05.834150Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:05.840540Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:05.845563Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203966146961000",
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:46:05.864265Z",
+    "phase": "latency-1795203962710876800",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203962710879500",
+    "result_present": false,
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:46:06.208277Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203966572049900",
+    "action": "describe"
+  },
+  {
+    "time": "2026-11-20T19:46:06.210810Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "capturing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:06.775484Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "processing",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:09.237037Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "speaking",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:09.240270Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "response",
+    "measurement": {
+      "request_id": "vlm-1795203966210773-9",
+      "status": "success",
+      "description": "На снимке видна часть интерьера комнаты с серым шторным материалом, который находится внизу и слева от центра. Слева от шторы виден деревянный шкаф, а вверху — белая стена с краем двери и красной ручкой. Внизу слева виден свет от источника, возможно, лампы.",
+      "model": "qwen3-vl:2b-instruct",
+      "captured_at": "2026-11-20T19:46:06.512352+00:00",
+      "processing_ms": 2358.94,
+      "preprocessing_ms": 8.3,
+      "image_width": 360,
+      "image_height": 640,
+      "timings": {
+        "load_ms": 8.2,
+        "prompt_eval_ms": 1116.2,
+        "eval_ms": 875.33,
+        "total_ms": 2104.33
+      },
+      "http_ms": 2458.64,
+      "capture_preprocessing_ms": 263.023,
+      "jpeg_bytes": 22829,
+      "full_response_ms": 3026.092
+    },
+    "detector_running": true,
+    "yolo_fps": 2.9596481570270927,
+    "camera_to_result_ms": 303.007,
+    "rss_bytes": 274862080
+  },
+  {
+    "time": "2026-11-20T19:46:09.608631Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "command",
+    "id": "1795203969804535400",
+    "action": "cancel"
+  },
+  {
+    "time": "2026-11-20T19:46:09.611994Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "state",
+    "state": "cancelled",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:09.614978Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "cancelled",
+    "status": "Описание отменено",
+    "detector_running": true
+  },
+  {
+    "time": "2026-11-20T19:46:09.617742Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203969804535400",
+    "state": "cancelled"
+  },
+  {
+    "time": "2026-11-20T19:46:09.626335Z",
+    "phase": "latency-1795203966572045100",
+    "scene": "Комната / мебель",
+    "type": "command_done",
+    "id": "1795203966572049900",
+    "result_present": false,
+    "state": "cancelled"
+  }
+]

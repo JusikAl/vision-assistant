@@ -1,0 +1,1048 @@
+{
+  "rows": [
+    {
+      "image_id": 1,
+      "sha256": "5392602083a5e448bd2dca51c9d1c00c3abb03d11c83b6ccd7e6221a65ef7139",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:15.528504+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201815528523400-1",
+        "status": "success",
+        "description": "На снимке видны ровные, серые ступени, расположенные вдоль лестницы. Слева и справа от центра лестницы видны вертикальные полосы, возможно, это часть стены или перегородки. Сцена выглядит как часть внутреннего пространства, возможно, это лестница в помещении.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:15.528504+00:00",
+        "processing_ms": 2577.91,
+        "preprocessing_ms": 10.78,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 15.44,
+          "prompt_eval_ms": 1056.27,
+          "eval_ms": 880.87,
+          "total_ms": 2187.84
+        }
+      },
+      "http_total_ms": 2595.876200008206
+    },
+    {
+      "image_id": 2,
+      "sha256": "6b09ddad0eae3936b000239533c2f6f95a235c3c31b94e52542b20453e8d3317",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:18.130833+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201818130861500-2",
+        "status": "success",
+        "description": "На снимке видна лестница с деревянными ступенями, ведущая вверх. Слева и справа от лестницы расположены стены, а вдоль левой стены видна рука, держащаяся за перила. Слева от лестницы видна часть стены, а справа — рука, держащаяся за перила.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:18.130833+00:00",
+        "processing_ms": 2575.3,
+        "preprocessing_ms": 41.79,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 11.78,
+          "prompt_eval_ms": 902.99,
+          "eval_ms": 927.26,
+          "total_ms": 2037.84
+        }
+      },
+      "http_total_ms": 2590.1190999429673
+    },
+    {
+      "image_id": 3,
+      "sha256": "3f2a22cd9fbf06efb21559f2f5750bcff851d09d2ce3582afe6c9f6e8bce1c01",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:20.721550+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201820721567300-3",
+        "status": "success",
+        "description": "На снимке виден человек, идущий по лестнице вверх. Слева от лестницы находится стена с зеленым растением в горшке. Вдоль лестницы расположены стальные перила. Вдоль стены справа видны двери с рамами.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:20.721550+00:00",
+        "processing_ms": 1995.0,
+        "preprocessing_ms": 5.77,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 11.09,
+          "prompt_eval_ms": 871.8,
+          "eval_ms": 696.92,
+          "total_ms": 1688.6
+        }
+      },
+      "http_total_ms": 2004.4447999680415
+    },
+    {
+      "image_id": 4,
+      "sha256": "eb321a963ec88d67746c8c4c86eab1116b85259bef292d1fb40dbad4b2d2c212",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:22.726860+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201822726883400-4",
+        "status": "success",
+        "description": "На снимке изображена современная лестница с черными ступенями и прозрачными стеклянными перилами. Слева от лестницы находится декоративная стена с камнями. Слева от лестницы видна часть потолка с деревянными балками.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:22.726860+00:00",
+        "processing_ms": 2213.04,
+        "preprocessing_ms": 8.16,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 20.49,
+          "prompt_eval_ms": 902.13,
+          "eval_ms": 734.97,
+          "total_ms": 1789.39
+        }
+      },
+      "http_total_ms": 2222.6244000485167
+    },
+    {
+      "image_id": 5,
+      "sha256": "ab89edf637d9ba8c1aed8e8ca8780ab6c1e8fd418a480b28df9834f572203b15",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:24.950138+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201824950152600-5",
+        "status": "success",
+        "description": "На снимке изображена современная стулья с мягким сиденьем и спинкой, выполненная в сером цвете с черными металлическими ножками. Стулья расположены в центре, на белом фоне, что указывает на студийную съемку.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:24.950138+00:00",
+        "processing_ms": 2113.85,
+        "preprocessing_ms": 5.49,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 7.06,
+          "prompt_eval_ms": 901.88,
+          "eval_ms": 677.44,
+          "total_ms": 1723.03
+        }
+      },
+      "http_total_ms": 2281.8365999264643
+    },
+    {
+      "image_id": 6,
+      "sha256": "343b955b6c8da89cede9d070241a2badce6f3246d0e001248e55fbd404c95cf1",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:27.232956+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201827232978800-6",
+        "status": "success",
+        "description": "На снимке видны два современных стула с черными сиденьями и деревянными спинками, стоящих на светлом деревянном полу. Слева от них находится часть белой мебели, а справа — часть черного стола. В правом верхнем углу виден светлый оконный проем.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:27.232956+00:00",
+        "processing_ms": 2019.44,
+        "preprocessing_ms": 6.38,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 6.55,
+          "prompt_eval_ms": 861.93,
+          "eval_ms": 760.27,
+          "total_ms": 1740.26
+        }
+      },
+      "http_total_ms": 2030.6251000147313
+    },
+    {
+      "image_id": 7,
+      "sha256": "aa14206525cc106ef37dd732e7f08c8d1dabe29152c17862e8bc36f0fb1802e4",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:29.264218+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201829264238200-7",
+        "status": "success",
+        "description": "На снимке изображены мужчина и женщина, сидящие на улице в городской среде. Слева виден мужчина с бородой и очками, справа — женщина в белой рубашке. На заднем плане — улица с зданиями, людьми и кафе. В левом верхнем углу текст на русском языке содержит информацию о ценах и условиях.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:29.264218+00:00",
+        "processing_ms": 2330.62,
+        "preprocessing_ms": 4.58,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 6.22,
+          "prompt_eval_ms": 895.15,
+          "eval_ms": 1053.86,
+          "total_ms": 2074.77
+        }
+      },
+      "http_total_ms": 3451.8454000353813
+    },
+    {
+      "image_id": 8,
+      "sha256": "e56bb4d71928e81a502b09a04588c69f70aa7f9c630d3c1fe3463bc0ab330a6c",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:32.717281+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201832717311700-8",
+        "status": "success",
+        "description": "На снимке изображены мужчина и женщина на улице в городской среде. Мужчина в очках и чёрной футболке, женщина в белой кофте. На заднем плане видны другие люди, здания и деревья. В левом верхнем углу текст на русском языке, указывающий на цены и условия.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:32.717281+00:00",
+        "processing_ms": 2237.96,
+        "preprocessing_ms": 5.18,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 6.26,
+          "prompt_eval_ms": 896.93,
+          "eval_ms": 927.32,
+          "total_ms": 1947.7
+        }
+      },
+      "http_total_ms": 2249.096399988048
+    },
+    {
+      "image_id": 9,
+      "sha256": "5f5df20d8f39257f93c21a2cc85be70e4d5d0848b0a986eaa7cebd7086252acf",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:34.968043+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201834968088900-9",
+        "status": "success",
+        "description": "На снимке виден серебристый мини-автомобиль, припаркованный на асфальтированной дороге. Слева от машины находится бордюр, а за ним — стена с вертикальными элементами. Машина расположена в профиль, и на заднем плане виден отраженный в лобовом стекле объект.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:34.968043+00:00",
+        "processing_ms": 2298.87,
+        "preprocessing_ms": 5.34,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 7.76,
+          "prompt_eval_ms": 883.98,
+          "eval_ms": 923.3,
+          "total_ms": 1938.24
+        }
+      },
+      "http_total_ms": 3467.7271000109613
+    },
+    {
+      "image_id": 10,
+      "sha256": "85a850f9a7bd82aa8a8cb76cca22a042771d7720c46072ee41d7356d0960165c",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:38.436492+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201838436508400-10",
+        "status": "success",
+        "description": "На снимке виден желтый автомобиль, похожий на мини-автомобиль, с желтой флагом на крыше. На задней части машины расположены два круглых изображения с лицами. Машина стоит на грунтовой дороге, слева виден задний угол другого автомобиля.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:38.436492+00:00",
+        "processing_ms": 2087.99,
+        "preprocessing_ms": 6.79,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 7.68,
+          "prompt_eval_ms": 894.32,
+          "eval_ms": 747.56,
+          "total_ms": 1824.91
+        }
+      },
+      "http_total_ms": 2097.111099981703
+    },
+    {
+      "image_id": 11,
+      "sha256": "2c7b5cf6b7ee8e6eaaec2bc4ee513848bad3dc0705199141202376ae1233cfb7",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:40.534711+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201840534732900-11",
+        "status": "success",
+        "description": "На снимке видна улица с пешеходным переходом, на котором идут люди. Слева и справа от перехода видны дороги, а впереди — пешеходы, идущие по переходу. На поверхности изображения видны точки, как будто сцена сделана через стекло или через дождь.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:40.534711+00:00",
+        "processing_ms": 2066.37,
+        "preprocessing_ms": 6.02,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 8.0,
+          "prompt_eval_ms": 869.15,
+          "eval_ms": 822.17,
+          "total_ms": 1808.14
+        }
+      },
+      "http_total_ms": 2070.85769996047
+    },
+    {
+      "image_id": 12,
+      "sha256": "0b9e2ee967185a3f7137b100f148fbc2e79f85deeed58148eaf63ccfaf2abceb",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:42.606408+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201842606433000-12",
+        "status": "success",
+        "description": "На снимке виден пешеходный переход на асфальтированной дороге, который выглядит как белые полосы на сером фоне. Слева и справа от дороги видны темные стены. На поверхности дороги и стен разбросаны мелкие точки, что может быть связано с пылью или водой.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:42.606408+00:00",
+        "processing_ms": 2069.06,
+        "preprocessing_ms": 5.18,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 7.29,
+          "prompt_eval_ms": 866.3,
+          "eval_ms": 851.05,
+          "total_ms": 1828.49
+        }
+      },
+      "http_total_ms": 2078.3363999798894
+    },
+    {
+      "image_id": 13,
+      "sha256": "b5ed91a3c7942ac848f97537cb30b361319a6081bd62221ca9dc82aa22071ec2",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:44.685640+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201844685657000-13",
+        "status": "success",
+        "description": "На снимке виден бетонный护栏, установленный на улице. За ним растут высокие зелёные кусты и деревья. Вдали видны многоэтажные здания. Слева и справа от барьера растут растения, а на земле — сухая трава и мусор.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:44.685640+00:00",
+        "processing_ms": 2070.85,
+        "preprocessing_ms": 5.5,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 15.96,
+          "prompt_eval_ms": 877.7,
+          "eval_ms": 818.71,
+          "total_ms": 1807.79
+        }
+      },
+      "http_total_ms": 2075.187500100583
+    },
+    {
+      "image_id": 14,
+      "sha256": "25883134e5c733c2bd1976bd9b048db4bec731a9b901ab66f80acd37cda61ac6",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:46.761694+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201846761710200-14",
+        "status": "success",
+        "description": "На снимке виден черный прямоугольный цветочный горшок с зелеными растениями, похожими на санчоху, в центре изображения.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:46.761694+00:00",
+        "processing_ms": 1807.36,
+        "preprocessing_ms": 5.03,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 6.42,
+          "prompt_eval_ms": 891.37,
+          "eval_ms": 441.09,
+          "total_ms": 1446.47
+        }
+      },
+      "http_total_ms": 1815.6197000062093
+    },
+    {
+      "image_id": 15,
+      "sha256": "b19203ebcbf3d23e7982fe071343a01b9735805785e57fdd7e3cdb276c6876c5",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:48.578253+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201848578288700-15",
+        "status": "success",
+        "description": "На снимке изображена двухэтажная светлая жилая квартира с бетонным фасадом, на крыше которого установлен старый дымоход. На первом этаже видны окна с белыми шторами, а на втором — несколько окон с тканевыми шторами. Слева от дома виден забор, а справа — часть соседнего здания. На улице нет людей, и на фоне — голубое небо.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:48.578253+00:00",
+        "processing_ms": 2323.84,
+        "preprocessing_ms": 4.84,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 5.6,
+          "prompt_eval_ms": 871.04,
+          "eval_ms": 1094.39,
+          "total_ms": 2077.45
+        }
+      },
+      "http_total_ms": 2327.766199945472
+    },
+    {
+      "image_id": 16,
+      "sha256": "d120324551c15d477cde983ce8a4b9d26c37a7489563cb1d965ff2ae743cba9b",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:50.907250+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201850907264200-16",
+        "status": "success",
+        "description": "На снимке изображена многоэтажная жилая застройка серого цвета с окнами и балконами. Слева на фасаде видна часть автомобиля. Справа и внизу видны растения. На верхнем этаже на балконе и в окнах видны тени.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:50.907250+00:00",
+        "processing_ms": 1994.68,
+        "preprocessing_ms": 3.83,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 15.72,
+          "prompt_eval_ms": 861.26,
+          "eval_ms": 743.95,
+          "total_ms": 1732.35
+        }
+      },
+      "http_total_ms": 2003.3136999700218
+    },
+    {
+      "image_id": 17,
+      "sha256": "65e0864fd15874639f3d8ead99d7f5cd404943a47df0cac269f34aa979cb0f42",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:52.911661+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201852911678900-17",
+        "status": "success",
+        "description": "На снимке видна темная, размытая поверхность с горизонтальными полосами, напоминающими текстуру или рельеф. Видны лишь линии и тени, но не различимы детали объектов. Изображение слишком размытое для точного анализа.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:52.911661+00:00",
+        "processing_ms": 1995.89,
+        "preprocessing_ms": 4.62,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 8.25,
+          "prompt_eval_ms": 889.73,
+          "eval_ms": 720.85,
+          "total_ms": 1727.55
+        }
+      },
+      "http_total_ms": 1999.9158000573516
+    },
+    {
+      "image_id": 18,
+      "sha256": "f3f6e9929b0921f3678d134aca8bfc43f2d1501632ced171ee4cfe2d8c1d6fce",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:54.912586+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201854912598500-18",
+        "status": "success",
+        "description": "На снимке видны два человека, расположенные рядом. Слева — мужчина с бородой и очками, справа — женщина в светлой одежде. На заднем плане видны здания и деревья, что указывает на уличную сцену на открытом воздухе.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:54.912586+00:00",
+        "processing_ms": 1928.97,
+        "preprocessing_ms": 4.3,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 6.07,
+          "prompt_eval_ms": 875.0,
+          "eval_ms": 698.53,
+          "total_ms": 1676.32
+        }
+      },
+      "http_total_ms": 1937.6167999580503
+    },
+    {
+      "image_id": 19,
+      "sha256": "2d35b511ee55e4192880b1362c273e19a28a8682ff2edcef86ba6034ac2bb4e8",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:56.851249+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201856851265600-19",
+        "status": "success",
+        "description": "На снимке виден белый автомобиль, стоящий на улице. Слева от него видна часть бетонной стены. Справа и впереди — тёмное пространство, возможно, забор или другая стена. На изображении не видно людей, дверей или лестниц.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:56.851249+00:00",
+        "processing_ms": 1950.37,
+        "preprocessing_ms": 3.73,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 13.65,
+          "prompt_eval_ms": 870.02,
+          "eval_ms": 717.81,
+          "total_ms": 1691.21
+        }
+      },
+      "http_total_ms": 1960.4465999873355
+    },
+    {
+      "image_id": 20,
+      "sha256": "4cf9cc0a089640031b3f3f028c4eda9430d816e64bf56c5efe5f4bf97ed55ca2",
+      "cold": false,
+      "captured_at": "2026-11-20T19:10:58.812700+00:00",
+      "http_status": 200,
+      "response": {
+        "request_id": "quality-1795201858812717900-20",
+        "status": "success",
+        "description": "На снимке виден аэроснимок улицы с пешеходным переходом, на котором проходят люди. Слева и справа от перехода видны дороги, а в центре — размытые фигуры людей.",
+        "model": "qwen3-vl:2b-instruct",
+        "captured_at": "2026-11-20T19:10:58.812700+00:00",
+        "processing_ms": 1799.75,
+        "preprocessing_ms": 4.43,
+        "image_width": 640,
+        "image_height": 640,
+        "timings": {
+          "load_ms": 5.08,
+          "prompt_eval_ms": 871.65,
+          "eval_ms": 560.92,
+          "total_ms": 1539.23
+        }
+      },
+      "http_total_ms": 1808.212299947627
+    }
+  ],
+  "resource_samples": [
+    {
+      "t": 781803.7023429,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 107163648,
+      "system_ram_used_bytes": 13275729920
+    },
+    {
+      "t": 781804.2891756,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 107163648,
+      "system_ram_used_bytes": 13508198400
+    },
+    {
+      "t": 781804.8976244,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 108453888,
+      "system_ram_used_bytes": 13761556480
+    },
+    {
+      "t": 781805.4834142,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 66,
+      "ollama_process_rss_bytes": 108527616,
+      "system_ram_used_bytes": 13905354752
+    },
+    {
+      "t": 781806.0648558,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 108560384,
+      "system_ram_used_bytes": 13829472256
+    },
+    {
+      "t": 781806.7362747,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 88,
+      "ollama_process_rss_bytes": 108560384,
+      "system_ram_used_bytes": 13735624704
+    },
+    {
+      "t": 781807.3317485,
+      "gpu_used_mib": 2673,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 108560384,
+      "system_ram_used_bytes": 14175961088
+    },
+    {
+      "t": 781807.922782,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 108871680,
+      "system_ram_used_bytes": 14539313152
+    },
+    {
+      "t": 781808.4883223,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 108871680,
+      "system_ram_used_bytes": 14424342528
+    },
+    {
+      "t": 781809.0692275,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 108871680,
+      "system_ram_used_bytes": 14457774080
+    },
+    {
+      "t": 781809.6358835,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 52,
+      "ollama_process_rss_bytes": 108896256,
+      "system_ram_used_bytes": 14475018240
+    },
+    {
+      "t": 781810.2160348,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 78,
+      "ollama_process_rss_bytes": 109477888,
+      "system_ram_used_bytes": 14718275584
+    },
+    {
+      "t": 781810.799429,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 82,
+      "ollama_process_rss_bytes": 109477888,
+      "system_ram_used_bytes": 14763544576
+    },
+    {
+      "t": 781811.3843667,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 90,
+      "ollama_process_rss_bytes": 109477888,
+      "system_ram_used_bytes": 14728597504
+    },
+    {
+      "t": 781811.9662343,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 57,
+      "ollama_process_rss_bytes": 109547520,
+      "system_ram_used_bytes": 14754308096
+    },
+    {
+      "t": 781812.5404186,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110120960,
+      "system_ram_used_bytes": 14921220096
+    },
+    {
+      "t": 781813.1214708,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 110120960,
+      "system_ram_used_bytes": 14930649088
+    },
+    {
+      "t": 781813.6974712,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 89,
+      "ollama_process_rss_bytes": 110120960,
+      "system_ram_used_bytes": 14969421824
+    },
+    {
+      "t": 781814.3321955,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110206976,
+      "system_ram_used_bytes": 15010996224
+    },
+    {
+      "t": 781816.1021726,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110231552,
+      "system_ram_used_bytes": 14884728832
+    },
+    {
+      "t": 781816.6847151,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 110379008,
+      "system_ram_used_bytes": 14932459520
+    },
+    {
+      "t": 781817.2648976,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 77,
+      "ollama_process_rss_bytes": 110362624,
+      "system_ram_used_bytes": 14542094336
+    },
+    {
+      "t": 781817.8253058,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 93,
+      "ollama_process_rss_bytes": 110362624,
+      "system_ram_used_bytes": 14529871872
+    },
+    {
+      "t": 781818.426805,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 110563328,
+      "system_ram_used_bytes": 14699540480
+    },
+    {
+      "t": 781818.9958144,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 77,
+      "ollama_process_rss_bytes": 110563328,
+      "system_ram_used_bytes": 14834970624
+    },
+    {
+      "t": 781819.570662,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 84,
+      "ollama_process_rss_bytes": 110563328,
+      "system_ram_used_bytes": 14830075904
+    },
+    {
+      "t": 781820.128301,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 87,
+      "ollama_process_rss_bytes": 110563328,
+      "system_ram_used_bytes": 14915661824
+    },
+    {
+      "t": 781820.7372917,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110567424,
+      "system_ram_used_bytes": 14891425792
+    },
+    {
+      "t": 781821.311941,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110567424,
+      "system_ram_used_bytes": 14949412864
+    },
+    {
+      "t": 781821.8835367,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 111181824,
+      "system_ram_used_bytes": 15088369664
+    },
+    {
+      "t": 781822.4533342,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 78,
+      "ollama_process_rss_bytes": 111198208,
+      "system_ram_used_bytes": 15179165696
+    },
+    {
+      "t": 781823.0664082,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 85,
+      "ollama_process_rss_bytes": 111198208,
+      "system_ram_used_bytes": 15163813888
+    },
+    {
+      "t": 781823.6699487,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 86,
+      "ollama_process_rss_bytes": 111198208,
+      "system_ram_used_bytes": 14811385856
+    },
+    {
+      "t": 781824.2460583,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 111218688,
+      "system_ram_used_bytes": 14966034432
+    },
+    {
+      "t": 781824.8067972,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 111218688,
+      "system_ram_used_bytes": 14974287872
+    },
+    {
+      "t": 781825.3862574,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 93,
+      "ollama_process_rss_bytes": 111218688,
+      "system_ram_used_bytes": 14998970368
+    },
+    {
+      "t": 781825.9565297,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 90,
+      "ollama_process_rss_bytes": 111218688,
+      "system_ram_used_bytes": 14954184704
+    },
+    {
+      "t": 781826.5251406,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 89,
+      "ollama_process_rss_bytes": 111218688,
+      "system_ram_used_bytes": 14960517120
+    },
+    {
+      "t": 781827.0970402,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 111218688,
+      "system_ram_used_bytes": 14977175552
+    },
+    {
+      "t": 781827.7247419,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 111050752,
+      "system_ram_used_bytes": 15200583680
+    },
+    {
+      "t": 781828.3023048,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 111050752,
+      "system_ram_used_bytes": 15226720256
+    },
+    {
+      "t": 781828.8739791,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 111050752,
+      "system_ram_used_bytes": 15199842304
+    },
+    {
+      "t": 781829.4370387,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 88,
+      "ollama_process_rss_bytes": 111050752,
+      "system_ram_used_bytes": 15138402304
+    },
+    {
+      "t": 781830.0207502,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 112009216,
+      "system_ram_used_bytes": 15332253696
+    },
+    {
+      "t": 781830.6001798,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 99,
+      "ollama_process_rss_bytes": 112009216,
+      "system_ram_used_bytes": 15327809536
+    },
+    {
+      "t": 781831.1725494,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 112009216,
+      "system_ram_used_bytes": 15317090304
+    },
+    {
+      "t": 781831.7442141,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 112160768,
+      "system_ram_used_bytes": 15427125248
+    },
+    {
+      "t": 781832.324015,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 112160768,
+      "system_ram_used_bytes": 15493496832
+    },
+    {
+      "t": 781832.9002663,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 96,
+      "ollama_process_rss_bytes": 112160768,
+      "system_ram_used_bytes": 15481868288
+    },
+    {
+      "t": 781833.4818014,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 83,
+      "ollama_process_rss_bytes": 112160768,
+      "system_ram_used_bytes": 15382667264
+    },
+    {
+      "t": 781834.0829204,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 27,
+      "ollama_process_rss_bytes": 111697920,
+      "system_ram_used_bytes": 15650271232
+    },
+    {
+      "t": 781834.6625361,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 67,
+      "ollama_process_rss_bytes": 111697920,
+      "system_ram_used_bytes": 15651229696
+    },
+    {
+      "t": 781835.2506269,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 88,
+      "ollama_process_rss_bytes": 111697920,
+      "system_ram_used_bytes": 15619928064
+    },
+    {
+      "t": 781835.8204658,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 111697920,
+      "system_ram_used_bytes": 15553593344
+    },
+    {
+      "t": 781836.3922413,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 15,
+      "ollama_process_rss_bytes": 111300608,
+      "system_ram_used_bytes": 15771598848
+    },
+    {
+      "t": 781836.9636956,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 111300608,
+      "system_ram_used_bytes": 15756914688
+    },
+    {
+      "t": 781837.5225553,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 111300608,
+      "system_ram_used_bytes": 15712124928
+    },
+    {
+      "t": 781838.1078389,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 111337472,
+      "system_ram_used_bytes": 15919611904
+    },
+    {
+      "t": 781838.6803172,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 95,
+      "ollama_process_rss_bytes": 111337472,
+      "system_ram_used_bytes": 15900368896
+    },
+    {
+      "t": 781839.2530332,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 92,
+      "ollama_process_rss_bytes": 111337472,
+      "system_ram_used_bytes": 15881011200
+    },
+    {
+      "t": 781839.8134432,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 90,
+      "ollama_process_rss_bytes": 111337472,
+      "system_ram_used_bytes": 15797694464
+    },
+    {
+      "t": 781840.3930299,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110698496,
+      "system_ram_used_bytes": 16019841024
+    },
+    {
+      "t": 781840.9753333,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 110698496,
+      "system_ram_used_bytes": 16011083776
+    },
+    {
+      "t": 781841.5417285,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 89,
+      "ollama_process_rss_bytes": 110698496,
+      "system_ram_used_bytes": 15995813888
+    },
+    {
+      "t": 781842.1691966,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 0,
+      "ollama_process_rss_bytes": 110710784,
+      "system_ram_used_bytes": 16136540160
+    },
+    {
+      "t": 781842.7364599,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 110710784,
+      "system_ram_used_bytes": 15969415168
+    },
+    {
+      "t": 781843.3037707,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 110710784,
+      "system_ram_used_bytes": 15941832704
+    },
+    {
+      "t": 781843.866788,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 110710784,
+      "system_ram_used_bytes": 15886704640
+    },
+    {
+      "t": 781844.429966,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 2,
+      "ollama_process_rss_bytes": 110845952,
+      "system_ram_used_bytes": 16092430336
+    },
+    {
+      "t": 781845.0082232,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 110845952,
+      "system_ram_used_bytes": 16097107968
+    },
+    {
+      "t": 781845.5658932,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 87,
+      "ollama_process_rss_bytes": 110845952,
+      "system_ram_used_bytes": 16078376960
+    },
+    {
+      "t": 781846.1469456,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 18,
+      "ollama_process_rss_bytes": 110870528,
+      "system_ram_used_bytes": 16263954432
+    },
+    {
+      "t": 781846.7279546,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 110870528,
+      "system_ram_used_bytes": 16278872064
+    },
+    {
+      "t": 781847.2987511,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 92,
+      "ollama_process_rss_bytes": 110870528,
+      "system_ram_used_bytes": 16243388416
+    },
+    {
+      "t": 781847.8665358,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 91,
+      "ollama_process_rss_bytes": 110870528,
+      "system_ram_used_bytes": 16208482304
+    },
+    {
+      "t": 781848.4410791,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 52,
+      "ollama_process_rss_bytes": 110891008,
+      "system_ram_used_bytes": 16381161472
+    },
+    {
+      "t": 781849.0178974,
+      "gpu_used_mib": 2677,
+      "gpu_utilization_percent": 100,
+      "ollama_process_rss_bytes": 110891008,
+      "system_ram_used_bytes": 16363712512
+    }
+  ],
+  "cold_request": "qwen3_vl_first_real_image.json",
+  "complete": true,
+  "resource_sample_note": "The original RSS samples include only processes named ollama and omit llama-server.exe. Do not use that field as total runtime RAM. Corrected Ollama+llama working-set sampling is in qwen3_vl_resource_probe.json; VRAM and request timings here remain valid."
+}

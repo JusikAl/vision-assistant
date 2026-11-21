@@ -1,0 +1,337 @@
+{
+  "reviewer": "Assistant visual review of twenty prepared images, including full-size checks of ambiguous cases; dataset boxes are non-exhaustive.",
+  "not_a_calibrated_accuracy_benchmark": true,
+  "reviews": [
+    {
+      "image_id": 1,
+      "visible_reference": "Ступени крупным планом",
+      "correct_objects": [
+        "лестница, серые ступени"
+      ],
+      "incorrect_objects_or_details": [
+        "вертикальные полосы/перегородки не подтверждены"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "вертикальные полосы/перегородки не подтверждены"
+      ],
+      "clarity_comment": "Возможное помещение обозначено как предположение.",
+      "length_chars": 259,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 2,
+      "visible_reference": "Лестница, стены, перила; людей нет",
+      "correct_objects": [
+        "лестница вверх, боковые стены"
+      ],
+      "incorrect_objects_or_details": [
+        "выдуманы руки на перилах слева и справа"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "выдуманы руки на перилах слева и справа"
+      ],
+      "clarity_comment": "Материал ступеней не проверяется по этому снимку.",
+      "length_chars": 240,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 3,
+      "visible_reference": "Лестничная площадка, человек, двери, перила",
+      "correct_objects": [
+        "лестница, человек, перила, двери справа"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Направление движения человека по одному кадру не подтверждено.",
+      "length_chars": 199,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 4,
+      "visible_reference": "Чёрная лестница, стеклянное ограждение, каменный декор слева",
+      "correct_objects": [
+        "лестница, стекло, каменный декор слева"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Стекло подтверждено просмотром полного изображения.",
+      "length_chars": 216,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 5,
+      "visible_reference": "Один серый стул на белом фоне",
+      "correct_objects": [
+        "стул, серое сиденье, тёмные ножки"
+      ],
+      "incorrect_objects_or_details": [
+        "множественное число вместо одного стула"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "множественное число вместо одного стула"
+      ],
+      "clarity_comment": "Грамматическая ошибка «современная стулья».",
+      "length_chars": 207,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 6,
+      "visible_reference": "Два стула, деревянный пол, чёрный стол справа",
+      "correct_objects": [
+        "два стула, пол, стол справа, окно"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Основная пространственная структура соответствует снимку.",
+      "length_chars": 243,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 7,
+      "visible_reference": "Мужчина слева, женщина справа, городская улица",
+      "correct_objects": [
+        "двое людей и стороны, улица"
+      ],
+      "incorrect_objects_or_details": [
+        "якобы текст о ценах и условиях"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "якобы текст о ценах и условиях"
+      ],
+      "clarity_comment": "Сидячее положение не подтверждено кадрированием; текст представляет служебный оверлей.",
+      "length_chars": 284,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 8,
+      "visible_reference": "Мужчина слева, женщина справа, люди и здания на фоне",
+      "correct_objects": [
+        "двое людей и стороны, здания, люди"
+      ],
+      "incorrect_objects_or_details": [
+        "якобы текст о ценах и условиях"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "якобы текст о ценах и условиях"
+      ],
+      "clarity_comment": "Текст об условиях/ценах не подтверждён.",
+      "length_chars": 253,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 9,
+      "visible_reference": "Серебристый автомобиль, бордюр, асфальт",
+      "correct_objects": [
+        "автомобиль, бордюр слева, дорога"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Деталь отражения неоднозначна, не оценивалась.",
+      "length_chars": 256,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 10,
+      "visible_reference": "Жёлтое транспортное средство, флаг, изображения лиц",
+      "correct_objects": [
+        "жёлтый транспорт, флаг, изображения"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Точный тип транспорта по этому ракурсу не оценивается.",
+      "length_chars": 235,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 11,
+      "visible_reference": "Пешеходный переход с людьми",
+      "correct_objects": [
+        "переход, люди, дорога"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Предположение о съёмке через дождь не подтверждено; видимая зернистость отмечена.",
+      "length_chars": 244,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 12,
+      "visible_reference": "Зебра на асфальте; боковых стен не видно",
+      "correct_objects": [
+        "пешеходный переход"
+      ],
+      "incorrect_objects_or_details": [
+        "тёмные стены слева и справа"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "тёмные стены слева и справа"
+      ],
+      "clarity_comment": "Неверное окружение вокруг правильно найденного перехода.",
+      "length_chars": 252,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 13,
+      "visible_reference": "Металлическое дорожное ограждение, растения, здания",
+      "correct_objects": [
+        "ограждение, зелень, здания"
+      ],
+      "incorrect_objects_or_details": [
+        "бетонный материал ограждения не соответствует видимому металлическому профилю"
+      ],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [
+        "бетонный материал ограждения не соответствует видимому металлическому профилю"
+      ],
+      "clarity_comment": "В русскую фразу вставлено китайское слово 护栏.",
+      "length_chars": 208,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 14,
+      "visible_reference": "Прямоугольный чёрный контейнер с растениями",
+      "correct_objects": [
+        "контейнер, растения, положение в центре"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Название растения «санчоху» не подтверждено и непонятно.",
+      "length_chars": 119,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 15,
+      "visible_reference": "Двухэтажное здание, окна, дымоход, дверь справа",
+      "correct_objects": [
+        "здание, окна, дымоход"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [
+        "входная дверь справа"
+      ],
+      "hallucinations": [],
+      "clarity_comment": "«Квартира» вместо здания; входная дверь заметна и не описана.",
+      "length_chars": 323,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 16,
+      "visible_reference": "Многоэтажный фасад, балконы, окна; часть автомобиля внизу",
+      "correct_objects": [
+        "здание, окна, балконы, часть автомобиля"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Фраза о машине «на фасаде» пространственно неудачна; автомобиль виден у нижнего края.",
+      "length_chars": 205,
+      "navigation_advice_observed": false,
+      "limitations_reported": null
+    },
+    {
+      "image_id": 17,
+      "visible_reference": "Сильно затемнённые ступени",
+      "correct_objects": [
+        "тёмная поверхность, горизонтальные линии, недостаток деталей"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Ограничение распознавания сообщено; уверенное название объекта не требуется.",
+      "length_chars": 215,
+      "navigation_advice_observed": false,
+      "limitations_reported": true
+    },
+    {
+      "image_id": 18,
+      "visible_reference": "Размытая сцена с двумя людьми",
+      "correct_objects": [
+        "двое людей, основные стороны"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Размытость явно не оговорена, описание мелких признаков излишне уверенное.",
+      "length_chars": 213,
+      "navigation_advice_observed": false,
+      "limitations_reported": false
+    },
+    {
+      "image_id": 19,
+      "visible_reference": "Очень тёмный снимок автомобиля",
+      "correct_objects": [
+        "автомобиль, тёмное окружение"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Недостаток освещения явно не объяснён; цвет автомобиля ненадёжен.",
+      "length_chars": 218,
+      "navigation_advice_observed": false,
+      "limitations_reported": false
+    },
+    {
+      "image_id": 20,
+      "visible_reference": "Размытый переход с людьми",
+      "correct_objects": [
+        "переход, размытые фигуры людей"
+      ],
+      "incorrect_objects_or_details": [],
+      "direction_errors_confirmed": [],
+      "important_omissions": [],
+      "hallucinations": [],
+      "clarity_comment": "Размытость фигур названа; мелкие детали не перечислены.",
+      "length_chars": 159,
+      "navigation_advice_observed": false,
+      "limitations_reported": true
+    }
+  ],
+  "summary": "Основные объекты обычно распознаны; есть выдуманные детали, ошибки количества/материала, пропуск двери и неполное сообщение ограничений. Неподтверждённых указаний о безопасности движения в этих 20 ответах не обнаружено."
+}

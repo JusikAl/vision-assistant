@@ -1,0 +1,72 @@
+{
+  "phase": "cancel-followup-1795203402278538800",
+  "cancelled_before_completion": true,
+  "events": [
+    {
+      "time": "2026-11-20T19:36:41.954654Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "command",
+      "id": "1795203402278541500",
+      "action": "describe"
+    },
+    {
+      "time": "2026-11-20T19:36:41.957930Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "state",
+      "state": "capturing",
+      "detector_running": true
+    },
+    {
+      "time": "2026-11-20T19:36:42.325807Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "state",
+      "state": "processing",
+      "detector_running": true
+    },
+    {
+      "time": "2026-11-20T19:36:42.744847Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "command",
+      "id": "1795203403009553600",
+      "action": "cancel"
+    },
+    {
+      "time": "2026-11-20T19:36:42.747134Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "state",
+      "state": "cancelled",
+      "detector_running": true
+    },
+    {
+      "time": "2026-11-20T19:36:42.749391Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "cancelled",
+      "status": "Описание отменено",
+      "detector_running": true
+    },
+    {
+      "time": "2026-11-20T19:36:42.751286Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "command_done",
+      "id": "1795203403009553600",
+      "state": "cancelled"
+    },
+    {
+      "time": "2026-11-20T19:36:42.753940Z",
+      "phase": "cancel-followup-1795203402278538800",
+      "scene": "Комната / мебель",
+      "type": "command_done",
+      "id": "1795203402278541500",
+      "result_present": false,
+      "state": "cancelled"
+    }
+  ],
+  "initial_attempt_note": "Previous batch cancel was issued at 19:34:26Z after the request completed at 19:34:22Z; retained as a mistimed attempt, not silently removed."
+}

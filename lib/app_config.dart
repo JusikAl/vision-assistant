@@ -12,7 +12,7 @@ class AppConfig {
 
   // IP сервера
   static String get serverHost {
-    return dotenv.env['SERVER_HOST']?.trim() ?? '192.168.8.57';
+    return dotenv.env['SERVER_HOST']?.trim() ?? '192.168.10.3';
   }
 
   // Порт сервера
@@ -43,5 +43,20 @@ class AppConfig {
   // Server health
   static String get healthUrl {
     return '$httpBaseUrl/health';
+  }
+
+  // VLM is independent of the detection mode and its WebSocket connection.
+  static Uri get vlmBaseUrl {
+    const override = String.fromEnvironment('VLM_BASE_URL');
+    final value = override.isNotEmpty
+        ? override
+        : dotenv.env['VLM_BASE_URL']?.trim();
+    final uri = Uri.parse(value == null || value.isEmpty ? httpBaseUrl : value);
+    if (!const ['http', 'https'].contains(uri.scheme) ||
+        uri.host.isEmpty ||
+        uri.userInfo.isNotEmpty) {
+      throw const FormatException('Invalid VLM_BASE_URL');
+    }
+    return uri;
   }
 }

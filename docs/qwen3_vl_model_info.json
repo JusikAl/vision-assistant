@@ -1,0 +1,48 @@
+{
+  "date_local": "2026-11-21",
+  "version": {
+    "version": "0.40.13"
+  },
+  "ps": {
+    "models": [
+      {
+        "name": "qwen3-vl:2b-instruct",
+        "model": "qwen3-vl:2b-instruct",
+        "size": 1764690492,
+        "digest": "afc393e3572c07db0bc84aa460d928a16c75f3fbb9ca9e0dccc4fbd2dafb573e",
+        "details": {
+          "parent_model": "",
+          "format": "gguf",
+          "family": "qwen3vl",
+          "families": [
+            "qwen3vl",
+            "clip"
+          ],
+          "parameter_size": "1.7B",
+          "quantization_level": "Q4_K_M"
+        },
+        "expires_at": "2026-11-21T00:27:04.5761169+05:00",
+        "size_vram": 1764690492,
+        "context_length": 2048,
+        "runner": "llamacpp"
+      }
+    ]
+  },
+  "model_details": {
+    "parent_model": "dhiltgen/qwen3-vl:2b-instruct-q4_K_M-llamacpp",
+    "format": "gguf",
+    "family": "qwen3vl",
+    "families": [
+      "qwen3vl",
+      "clip"
+    ],
+    "parameter_size": "1.7B",
+    "quantization_level": "Q4_K_M",
+    "runner": "llamacpp"
+  },
+  "capabilities": [
+    "completion",
+    "vision",
+    "tools"
+  ]
+}
